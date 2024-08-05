@@ -4,4 +4,5 @@
     <string name="person_search">Pesquisa de Pessoas/Utentes</string>
     <string name="no_search_results">Nenhum resultado foi encontrado.</string>
     <string name="htc_person_gender_mandatory">O sexo é obrigatório.</string>
+    <string name="switch_program">Mudar Perfil</string>
 </resources>

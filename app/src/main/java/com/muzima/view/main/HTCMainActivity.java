@@ -31,6 +31,7 @@ import com.muzima.api.model.HTCPerson;
 import com.muzima.api.model.User;
 
 import com.muzima.controller.HTCPersonController;
+import com.muzima.controller.SetupConfigurationController;
 import com.muzima.model.patient.PatientItem;
 import com.muzima.scheduler.MuzimaJobScheduleBuilder;
 import com.muzima.utils.StringUtils;
@@ -38,6 +39,7 @@ import com.muzima.utils.ThemeUtils;
 import com.muzima.utils.VerticalSpaceItemDecoration;
 import com.muzima.utils.ViewUtil;
 import com.muzima.view.BroadcastListenerActivity;
+import com.muzima.view.login.ActiveConfigSelectionActivity;
 import com.muzima.view.login.LoginActivity;
 import com.muzima.view.person.PersonRegisterActivity;
 import com.muzima.view.person.SearchSESPPersonActivity;
@@ -123,6 +125,8 @@ public class HTCMainActivity extends BroadcastListenerActivity {
                 startActivity(intent);
             }
         });
+
+
     }
 
     @Override
@@ -131,6 +135,12 @@ public class HTCMainActivity extends BroadcastListenerActivity {
         inflater.inflate(R.menu.menu_htc_main, menu);
 
         syncMenuAction = findViewById(R.id.menu_sync_htc);
+
+        MenuItem navSwitchConfigs = menu.findItem(R.id.menu_switch_program);
+        SetupConfigurationController configController = ((MuzimaApplication) getApplicationContext()).getSetupConfigurationController();
+        navSwitchConfigs.setVisible(configController.hasMultipleConfigTemplates());
+
+
         return true;
     }
 
@@ -163,9 +173,17 @@ public class HTCMainActivity extends BroadcastListenerActivity {
             case R.id.menu_language:
                 openLanguageDialog();
                 return true;
+            case R.id.menu_switch_program:
+                switchProgram();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void switchProgram() {
+        Intent intent = new Intent(getApplicationContext(), ActiveConfigSelectionActivity.class);
+        startActivity(intent);
     }
 
     private void openLanguageDialog() {

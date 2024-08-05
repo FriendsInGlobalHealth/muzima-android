@@ -756,7 +756,7 @@ public class GuidedConfigurationWizardActivity extends BroadcastListenerActivity
                 downloadProvidersLog.setSetupActionResultStatus(resultStatus);
                 onQueryTaskFinish();
                 // analisar este ponto
-                if ((setting != null && setting.getValueString() != null) && setting.getValueString().equals("ATS")) {
+                if (userHasHTCProgram()) {
                     downloadHtcPersons();
                 } else {
                     downloadCohorts();
@@ -769,6 +769,13 @@ public class GuidedConfigurationWizardActivity extends BroadcastListenerActivity
 
             }
         }.execute();
+    }
+
+    private boolean userHasHTCProgram() {
+        for (String setupConfigUuid : setupConfigTemplateUuidList) {
+            if (setupConfigUuid.equals("1eaa9574-fa5a-4655-bd63-466b538c5b5d")) return true;
+        }
+        return false;
     }
 
     private void downloadConcepts() {
@@ -1282,6 +1289,10 @@ public class GuidedConfigurationWizardActivity extends BroadcastListenerActivity
                 downloadHtcPersonsLog.setSetupActionResult(resultDescription);
                 downloadHtcPersonsLog.setSetupActionResultStatus(resultStatus);
                 onQueryTaskFinish();
+
+                if (setupConfigTemplateUuidList.size() > 1) {
+                    downloadCohorts();
+                }
             }
 
             @Override
