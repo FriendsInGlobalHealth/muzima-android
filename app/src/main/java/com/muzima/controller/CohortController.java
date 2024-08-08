@@ -86,7 +86,8 @@ public class CohortController {
         try {
             List<Cohort> allCohorts = cohortService.getAllCohorts();
             boolean isDisplayOnlyCohortsInConfig = muzimaSettingController.isDisplayOnlyCohortsInConfigEnabled();
-            if(isDisplayOnlyCohortsInConfig) {
+            boolean isMultipleConfigsSupported = muzimaSettingController.isMultipleConfigsSupported();
+            if(isDisplayOnlyCohortsInConfig || isMultipleConfigsSupported) {
                 List<Cohort> cohortsInConfig = new ArrayList<>();
                 List<String> cohortUuids = getCohortsInConfig();
                 for(Cohort cohort : allCohorts){
@@ -478,6 +479,7 @@ public class CohortController {
             throw new CohortDeleteException(e);
         }
     }
+
 
     public static class CohortDownloadException extends Throwable {
         public CohortDownloadException(Throwable throwable) {
