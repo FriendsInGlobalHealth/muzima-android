@@ -510,7 +510,7 @@ public class LoginActivity extends BaseActivity {
             if (result.status == SyncStatusConstants.AUTHENTICATION_SUCCESS) {
                 if(isNewUser && !isFirstLaunchValue && ((MuzimaApplication) getApplication()).getMuzimaSettingController().isClearAppDataIfNewUserEnabled()){
                     showAlertDialog(result.credentials);
-                }else {
+                } else {
                     if (isOnlineModeEnabled) {
                         muzimaApplication.deleteAllPatientsData();
                     }
