@@ -20,6 +20,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.muzima.MuzimaApplication;
+import com.muzima.R;
 import com.muzima.api.model.Cohort;
 import com.muzima.api.model.LastSyncTime;
 import com.muzima.api.model.MuzimaSetting;
@@ -28,9 +29,8 @@ import com.muzima.api.service.LastSyncTimeService;
 import com.muzima.api.service.MuzimaSettingService;
 
 import com.muzima.api.service.SetupConfigurationService;
-
-import com.muzima.R;
 import com.muzima.service.SntpService;
+import com.muzima.utils.StringUtils;
 import com.muzima.view.MainDashboardActivity;
 
 import org.apache.lucene.queryParser.ParseException;
@@ -41,6 +41,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -70,6 +71,7 @@ import static com.muzima.util.Constants.ServerSettings.MULTIPLE_CONFIGS_ENABLED_
 import static com.muzima.util.Constants.ServerSettings.OBS_LISTING_UNDER_CLIENT_SUMMARY_SETTING;
 import static com.muzima.util.Constants.ServerSettings.ONLINE_ONLY_MODE_ENABLED_SETTING;
 import static com.muzima.util.Constants.ServerSettings.PATIENT_IDENTIFIER_AUTOGENERATTION_SETTING;
+import static com.muzima.util.Constants.ServerSettings.PATIENT_LIST_HIDE_WITH_TAGS_SETTING;
 import static com.muzima.util.Constants.ServerSettings.PATIENT_REGISTRATION_BUTTON_ACTION_ENABLED_SETTING;
 import static com.muzima.util.Constants.ServerSettings.PATIENT_REGISTRATION_ENABLED_SETTING;
 import static com.muzima.util.Constants.ServerSettings.RELATIONSHIP_FEATURE_ENABLED;
@@ -757,11 +759,18 @@ public class MuzimaSettingController {
     public boolean isSameDerivedConceptUsedToFilterMoreThanOneCohort(String derivedConceptUuid) {
         try {
             MuzimaSetting muzimaSetting = getSettingByProperty(COHORT_FILTER_DERIVED_CONCEPT_MAP);
+            List<Cohort> cohorts = new ArrayList<>();
+            if(isMultipleConfigsSupported()){
+                cohorts = cohortController.getAllCohorts();
+            }else{
+                cohorts = cohortController.getCohorts();
+            }
+
             if (muzimaSetting != null) {
                 String settingValue = muzimaSetting.getValueString();
                 if(settingValue != null) {
                     List<String> conceptUuids = new ArrayList<>();
-                    for (Cohort cohort : cohortController.getCohorts()) {
+                    for (Cohort cohort : cohorts) {
                         if (cohortController.isDownloaded(cohort)) {
                             JSONObject jsonObject = new JSONObject(settingValue);
                             Object derivedConceptObject = null;
@@ -865,6 +874,7 @@ public class MuzimaSettingController {
         } catch (JSONException e) {
             Log.e(getClass().getSimpleName(), "Error while parsing json object");
         }
+
         return false;
     }
 
@@ -894,7 +904,20 @@ public class MuzimaSettingController {
         return false;
     }
 
-
+    public List<String> getTagsForPatientsToHide() throws MuzimaSettingFetchException {
+        List<String> tags = new ArrayList<>();
+        try {
+            MuzimaSetting muzimaSetting = getSettingByProperty(PATIENT_LIST_HIDE_WITH_TAGS_SETTING);
+            if (muzimaSetting != null) {
+                if (!StringUtils.isEmpty(muzimaSetting.getValueString()))
+                    tags = Arrays.asList(muzimaSetting.getValueString().split("\\s*,\\s*"));
+            } else
+                Log.d(getClass().getSimpleName(), "Setting is missing on the server");
+        } catch (MuzimaSettingFetchException e) {
+            Log.e(getClass().getSimpleName(), "Setting is missing on the server");
+        }
+        return tags;
+    }
 
     public static class MuzimaSettingFetchException extends Throwable {
         MuzimaSettingFetchException(Throwable throwable) {

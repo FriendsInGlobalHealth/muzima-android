@@ -35,8 +35,13 @@ import java.util.List;
 import java.util.Map;
 
 import static com.muzima.util.Constants.PATIENT_DELETION_PENDING_STATUS;
+import static com.muzima.utils.Constants.LOCAL_PATIENT;
+import static com.muzima.utils.Constants.STATUS_COMPLETE;
+import static com.muzima.utils.Constants.STATUS_INCOMPLETE;
 
-import com.muzima.utils.Constants;
+import static com.muzima.utils.Constants.FGH.TagsUuids.ALREADY_ASSIGNED_TAG_UUID;
+import static com.muzima.utils.Constants.FGH.TagsUuids.AWAITING_ASSIGNMENT_TAG_UUID;
+import static com.muzima.utils.Constants.FGH.TagsUuids.HAS_SEXUAL_PARTNER_TAG_UUID;
 
 public class PatientController {
 
@@ -172,7 +177,7 @@ public class PatientController {
             List<Patient> localPatients = new ArrayList<>();
             List<Patient> allPatients = getAllPatients();
             for (Patient patient : allPatients) {
-                PatientIdentifier localPatientIdentifier = patient.getIdentifier(Constants.LOCAL_PATIENT);
+                PatientIdentifier localPatientIdentifier = patient.getIdentifier(LOCAL_PATIENT);
                 if (localPatientIdentifier != null && localPatientIdentifier.getIdentifier().equals(patient.getUuid())) {
                     localPatients.add(patient);
                 }
@@ -368,19 +373,20 @@ public class PatientController {
         if (tagsUuid == null || tagsUuid.isEmpty()) {
             return patients;
         }
-        boolean isPartnerTagNeeded = tagsUuid.contains(Constants.FGH.TagsUuids.HAS_SEXUAL_PARTNER_TAG_UUID);
+
+        boolean isPartnerTagNeeded = tagsUuid.contains(HAS_SEXUAL_PARTNER_TAG_UUID);
         if(isPartnerTagNeeded && tagsUuid.size() > 1) {
-            tagsUuid.remove(Constants.FGH.TagsUuids.HAS_SEXUAL_PARTNER_TAG_UUID);
+            tagsUuid.remove(HAS_SEXUAL_PARTNER_TAG_UUID);
         }
 
-        boolean isAlTagsNeeded = tagsUuid.contains(Constants.FGH.TagsUuids.ALREADY_ASSIGNED_TAG_UUID);
+        boolean isAlTagsNeeded = tagsUuid.contains(ALREADY_ASSIGNED_TAG_UUID);
         if(isAlTagsNeeded){
-            tagsUuid.remove(Constants.FGH.TagsUuids.ALREADY_ASSIGNED_TAG_UUID);
+            tagsUuid.remove(ALREADY_ASSIGNED_TAG_UUID);
         }
 
-        boolean isAaTagsNeeded = tagsUuid.contains(Constants.FGH.TagsUuids.AWAITING_ASSIGNMENT_TAG_UUID);
+        boolean isAaTagsNeeded = tagsUuid.contains(AWAITING_ASSIGNMENT_TAG_UUID);
         if(isAaTagsNeeded){
-            tagsUuid.remove(Constants.FGH.TagsUuids.AWAITING_ASSIGNMENT_TAG_UUID);
+            tagsUuid.remove(AWAITING_ASSIGNMENT_TAG_UUID);
         }
 
         List<Patient> filteredPatients = new ArrayList<>();
@@ -400,7 +406,7 @@ public class PatientController {
             if(isPartnerTagNeeded && filteredPatients.contains(patient)){
                 boolean hasPartnerTag = false;
                 for (PatientTag patientTag : patientTags) {
-                    if(Constants.FGH.TagsUuids.HAS_SEXUAL_PARTNER_TAG_UUID.equals(patientTag.getUuid())){
+                    if(HAS_SEXUAL_PARTNER_TAG_UUID.equals(patientTag.getUuid())){
                         hasPartnerTag = true;
                         break;
                     }
@@ -413,8 +419,8 @@ public class PatientController {
                 boolean hasAlAaTag = false;
                 for (PatientTag patientTag : patientTags) {
 
-                    if(isAlTagsNeeded && Constants.FGH.TagsUuids.ALREADY_ASSIGNED_TAG_UUID.equals(patientTag.getUuid()) ||
-                            isAaTagsNeeded && Constants.FGH.TagsUuids.AWAITING_ASSIGNMENT_TAG_UUID.equals(patientTag.getUuid())){
+                    if(isAlTagsNeeded && ALREADY_ASSIGNED_TAG_UUID.equals(patientTag.getUuid()) ||
+                            isAaTagsNeeded && AWAITING_ASSIGNMENT_TAG_UUID.equals(patientTag.getUuid())){
                         hasAlAaTag = true;
                         break;
                     }
@@ -425,6 +431,24 @@ public class PatientController {
             }
         }
         return filteredPatients;
+    }
+
+    public List<Patient> removePatientsWithTags(List<Patient> patients, List<String> tagsUuid){
+        if (tagsUuid == null || tagsUuid.isEmpty()) {
+            return patients;
+        }
+        List<Patient> patientsToRemove = new ArrayList<>();
+        for (Patient patient : patients) {
+            PatientTag[] patientTags = patient.getTags();
+            for (PatientTag patientTag : patientTags) {
+                if (tagsUuid.contains(patientTag.getUuid())) {
+                    patientsToRemove.add(patient);
+                    break;
+                }
+            }
+        }
+        patients.removeAll(patientsToRemove);
+        return patients;
     }
 
     public void deletePatientByCohortMembership(List<CohortMember> cohortMembers){
@@ -474,8 +498,8 @@ public class PatientController {
     }
 
     public int getFormDataCount(String patientUuid) throws IOException {
-        int incompleteFormCount = formService.countFormDataByPatient(patientUuid, Constants.STATUS_INCOMPLETE);
-        int completeFormCount = formService.countFormDataByPatient(patientUuid, Constants.STATUS_COMPLETE);
+        int incompleteFormCount = formService.countFormDataByPatient(patientUuid,STATUS_INCOMPLETE);
+        int completeFormCount = formService.countFormDataByPatient(patientUuid,STATUS_COMPLETE);
         int formCount = incompleteFormCount + completeFormCount;
         return formCount;
     }
