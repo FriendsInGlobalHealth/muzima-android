@@ -42,7 +42,7 @@ public class ConceptControllerTest {
     @Before
     public void setUp() {
         initMocks(this);
-        controller = new ConceptController(service,observationService);
+        //controller = new ConceptController(service,observationService);
     }
 
     @Test
