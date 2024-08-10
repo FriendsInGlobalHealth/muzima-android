@@ -45,9 +45,7 @@ public class DownloadSetupConfigurationsTask implements Runnable {
             ((MuzimaApplication) context.getApplicationContext()).getMuzimaSyncService().downloadSetupConfigurations();
             setupConfigurations = ((MuzimaApplication) context.getApplicationContext()).getSetupConfigurationController().getAllSetupConfigurations();
             Log.e(TAG, "#SetupConfigurations: " + setupConfigurations.size());
-        } catch (SetupConfigurationController.SetupConfigurationDownloadException e) {
-            Log.e(TAG, "Exception occurred while fetching the downloaded Setup Configurations", e);
-        } catch (MuzimaSettingController.MuzimaSettingDownloadException e) {
+        } catch (Throwable e) {
             Log.e(TAG, "Exception occurred while downloading setting", e);
         }
         callback.setupConfigDownloadCompleted(setupConfigurations, multipleConfigsSupportSetting);
