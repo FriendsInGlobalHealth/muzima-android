@@ -302,7 +302,7 @@
     <string name="hint_form_download">Por favor seleccione formulários a partir da lista de todos os formulários e clique em baixar</string>
     <string name="hint_form_validation_failure">Existe uma ou mais falhas de validação neste formulário. Por favor revise e reenvie o formulário</string>
     <string name="hint_future_date_validation_failure">Por favor introduza uma data futura</string>
-    <string name="hint_guided_setup">Seleccione a presente configuração e permita mUzima fazer o resto</string>
+    <string name="hint_guided_setup">Selecione o perfil no qual irá trabalhar</string>
     <string name="hint_help_prompt">Por favor insira a sua mensagem</string>
     <string name="hint_image_caption_prompt">Por favor introduza uma legenda para a imagem</string>
     <string name="hint_incomplete_form_unavailable">Formulários incompletos estão disponíveis somente se tiver guardado um formulário preenchido parcialmente</string>
@@ -806,4 +806,6 @@ O aplicativo mUzima for Health Providers (o \"Aplicativo\") é desenvolvido como
     <string name="error_settings_save">Ocorreu um erro ao salvar as configurações</string>
     <string name="error_dataset_save">Ocorreu um erro ao salvar o conjunto de dados do relatório</string>
     <string name="error_media_category_save">Ocorreu um erro ao salvar a categoria de mídia</string>
+    <string name="general_program_selection">Selecção de perfil</string>
+    <string name="general_switch_program">Trocar perfil</string>
 </resources>

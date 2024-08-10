@@ -319,7 +319,7 @@ public class PatientsLocalSearchAdapter extends PatientAdapterHelper implements 
                         }
                     }
                 } else {
-                    if (cohortUuidsInActiveConfig == null) {
+                    if (cohortUuidsInActiveConfig == null || cohortUuidsInActiveConfig.isEmpty()) {
                         if (!isSubsequentLazyFetchQuery) {
                             patientCount = patientController.countAllPatients();
                             totalPageCount = new Double(Math.ceil((float) patientCount / pageSize)).intValue();
@@ -386,6 +386,8 @@ public class PatientsLocalSearchAdapter extends PatientAdapterHelper implements 
             } catch (PatientController.PatientLoadException e) {
                 Log.e(getClass().getSimpleName(), "Exception occurred while fetching patients", e);
             }
+
+            if(patients == null) patients = new ArrayList<>();
             List<String> tags = patientController.getSelectedTagUuids();
             filteredPatients = patientController.filterPatientByTags(patients,tags);
 

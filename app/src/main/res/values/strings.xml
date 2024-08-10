@@ -812,4 +812,6 @@ mUzima is a mobile application that enables health professionals collect, manage
     <string name="error_settings_save">An error occurred when saving settings</string>
     <string name="error_dataset_save">An error occurred when saving report dataset</string>
     <string name="error_media_category_save">An error occurred when saving media category</string>
+    <string name="general_program_selection">Program Selection</string>
+    <string name="general_switch_program">Switch Program</string>
 </resources>
