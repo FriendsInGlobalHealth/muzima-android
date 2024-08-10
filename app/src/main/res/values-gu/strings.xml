@@ -799,4 +799,6 @@
     <string name="error_settings_save">સેટિંગ્સ સાચવતી વખતે એક ભૂલ આવી</string>
     <string name="error_dataset_save">રિપોર્ટ ડેટાસેટ સાચવતી વખતે એક ભૂલ આવી</string>
     <string name="error_media_category_save">મીડિયા કેટેગરી સાચવતી વખતે એક ભૂલ આવી</string>
+    <string name="general_program_selection">પ્રોગ્રામ પસંદગી</string>
+    <string name="general_switch_program">પ્રોગ્રામ સ્વિચ કરો</string>
 </resources>

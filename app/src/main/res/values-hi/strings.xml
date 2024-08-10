@@ -798,4 +798,5 @@
     <string name="error_settings_save">सेटिंग्स सहेजते समय एक त्रुटि उत्पन्न हुई</string>
     <string name="error_dataset_save">रिपोर्ट डेटासेट सहेजते समय एक त्रुटि उत्पन्न हुई</string>
     <string name="error_media_category_save">मीडिया श्रेणी सहेजते समय एक त्रुटि उत्पन्न हुई</string>
-</resources>
+    <string name="general_program_selection">प्रोग्राम चयन</string>
+    <string name="general_switch_program">प्रोग्राम स्विच करें</string></resources>

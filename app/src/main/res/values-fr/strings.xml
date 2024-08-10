@@ -807,4 +807,5 @@
     <string name="error_settings_save">Une erreur s\'est produite lors de l\'enregistrement des paramètres</string>
     <string name="error_dataset_save">Une erreur s\'est produite lors de l\'enregistrement de l\'ensemble de données du rapport</string>
     <string name="error_media_category_save">Une erreur s\'est produite lors de l\'enregistrement de la catégorie multimédia</string>
-</resources>
+    <string name="general_program_selection">Sélection de programme</string>
+    <string name="general_switch_program">Changer de programme</string></resources>
