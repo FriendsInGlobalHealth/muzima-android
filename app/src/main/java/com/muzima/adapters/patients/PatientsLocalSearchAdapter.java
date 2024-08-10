@@ -319,7 +319,7 @@ public class PatientsLocalSearchAdapter extends PatientAdapterHelper implements 
                         }
                     }
                 } else {
-                    if (cohortUuidsInActiveConfig == null) {
+                    if (cohortUuidsInActiveConfig == null || cohortUuidsInActiveConfig.isEmpty()) {
                         if (!isSubsequentLazyFetchQuery) {
                             patientCount = patientController.countAllPatients();
                             totalPageCount = new Double(Math.ceil((float) patientCount / pageSize)).intValue();
