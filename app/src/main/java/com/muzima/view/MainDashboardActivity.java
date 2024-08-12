@@ -62,6 +62,8 @@ import com.muzima.adapters.patients.PatientTagsListAdapter;
 import com.muzima.api.model.Patient;
 import com.muzima.api.model.PatientIdentifier;
 import com.muzima.api.model.PatientTag;
+import com.muzima.api.model.SetupConfiguration;
+import com.muzima.api.model.SetupConfigurationTemplate;
 import com.muzima.api.model.SmartCardRecord;
 import com.muzima.controller.FormController;
 import com.muzima.controller.MuzimaSettingController;
@@ -105,6 +107,7 @@ public class MainDashboardActivity extends ActivityWithBottomNavigation implemen
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private TextView headerTitleTextView;
+    private TextView headerTitleConfigNameTextView;
     private final LanguageUtil languageUtil = new LanguageUtil();
     private Credentials credentials;
     private BottomSheetBehavior cohortFilterBottomSheetBehavior;
@@ -390,6 +393,7 @@ public class MainDashboardActivity extends ActivityWithBottomNavigation implemen
         filterOptionsRecyclerView.setAdapter(cohortFilterAdapter);
         filterOptionsRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         headerTitleTextView = navigationView.getHeaderView(0).findViewById(R.id.dashboard_header_title_text_view);
+        headerTitleConfigNameTextView = navigationView.getHeaderView(0).findViewById(R.id.dashboard_header_title_config_name_text_view);
 
         FragmentContainerView fragmentContainerView = findViewById(R.id.nav_host_fragment);
 
@@ -454,8 +458,18 @@ public class MainDashboardActivity extends ActivityWithBottomNavigation implemen
         });
 
         cohortFilterBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-        if (((MuzimaApplication) getApplicationContext()).getAuthenticatedUser() != null)
+        if (((MuzimaApplication) getApplicationContext()).getAuthenticatedUser() != null) {
             headerTitleTextView.setText(((MuzimaApplication) getApplicationContext()).getAuthenticatedUser().getUsername());
+
+            try {
+                SetupConfigurationController setupConfigurationController = ((MuzimaApplication) getApplicationContext()).getSetupConfigurationController();
+                SetupConfigurationTemplate template = setupConfigurationController.getActiveSetupConfigurationTemplate();
+                SetupConfiguration setupConfiguration = setupConfigurationController.getSetupConfigurations(template.getUuid());
+                headerTitleConfigNameTextView.setText("(" + setupConfiguration.getName() + ")");
+            } catch (Throwable e) {
+                Log.e(getClass().getSimpleName(),"Cannot fetch active setup config",e);
+            }
+        }
         setTitle(StringUtils.EMPTY);
     }
 
