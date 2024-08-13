@@ -68,6 +68,7 @@ import com.muzima.controller.SetupConfigurationController;
 import com.muzima.domain.Credentials;
 import com.muzima.scheduler.MuzimaJobScheduleBuilder;
 import com.muzima.scheduler.RealTimeFormUploader;
+import com.muzima.service.ActiveConfigPreferenceService;
 import com.muzima.service.ConfidentialityNoticeDisplayPreferenceService;
 import com.muzima.service.CredentialsPreferenceService;
 import com.muzima.service.LocalePreferenceService;
@@ -510,7 +511,7 @@ public class LoginActivity extends BaseActivity {
             if (result.status == SyncStatusConstants.AUTHENTICATION_SUCCESS) {
                 if(isNewUser && !isFirstLaunchValue && ((MuzimaApplication) getApplication()).getMuzimaSettingController().isClearAppDataIfNewUserEnabled()){
                     showAlertDialog(result.credentials);
-                }else {
+                } else {
                     if (isOnlineModeEnabled) {
                         muzimaApplication.deleteAllPatientsData();
                     }
@@ -1023,7 +1024,9 @@ public class LoginActivity extends BaseActivity {
 
 
             SetupConfigurationController configController = ((MuzimaApplication) getApplicationContext()).getSetupConfigurationController();
-            if(configController.hasMultipleConfigTemplates())
+            ActiveConfigPreferenceService service = new ActiveConfigPreferenceService((MuzimaApplication) getApplicationContext());
+            String activeConfigUuid = service.getActiveConfigUuid();
+            if(configController.hasMultipleConfigTemplates() && StringUtils.isEmpty(activeConfigUuid))
                 intent = new Intent(getApplicationContext(), ActiveConfigSelectionActivity.class);
             else
             {

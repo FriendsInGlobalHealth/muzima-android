@@ -44,14 +44,16 @@ public class PatientsLocalSearchAdapter extends PatientAdapterHelper implements 
     private boolean useFuzzySearch;
     private int totalPageCount;
     private Map<Integer, PatientFilterPageNumberMap> totalPageCountMap = new HashMap<>();
+    private final List<String> cohortUuidsInActiveConfig;
 
 
     public PatientsLocalSearchAdapter(Context context, PatientController patientController,
                                       List<String> cohortUuids, List<CohortFilter> filters,
-                                      MuzimaGPSLocation currentLocation, MuzimaSettingController muzimaSettingController) {
+                                      MuzimaGPSLocation currentLocation, MuzimaSettingController muzimaSettingController, List<String> cohortUuidsInActiveConfig) {
         super(context,patientController, muzimaSettingController);
         this.patientController = patientController;
         this.muzimaSettingController = muzimaSettingController;
+        this.cohortUuidsInActiveConfig = cohortUuidsInActiveConfig;
         if (cohortUuids != null){
             this.cohortUuids = cohortUuids;
         } else {
@@ -319,21 +321,65 @@ public class PatientsLocalSearchAdapter extends PatientAdapterHelper implements 
                         }
                     }
                 } else {
-                    if(!isSubsequentLazyFetchQuery) {
-                        patientCount = patientController.countAllPatients();
-                        totalPageCount = new Double(Math.ceil((float) patientCount / pageSize)).intValue();
-                    }
-                    if(patientCount <= pageSize){
-                        patients = patientController.getAllPatients();
-                    } else {
-                        List<Patient> temp = null;
-                        if(!isCancelled()) {
-                            if (patients == null) {
-                                patients = patientController.getPatients(nextPageToLoad, pageSize);
-                            } else {
-                                temp = patientController.getPatients(nextPageToLoad, pageSize);
-                                if (temp != null) {
-                                    patients.addAll(temp);
+                    if (cohortUuidsInActiveConfig == null || cohortUuidsInActiveConfig.isEmpty()) {
+                        if (!isSubsequentLazyFetchQuery) {
+                            patientCount = patientController.countAllPatients();
+                            totalPageCount = new Double(Math.ceil((float) patientCount / pageSize)).intValue();
+                        }
+                        if (patientCount <= pageSize) {
+                            patients = patientController.getAllPatients();
+                        } else {
+                            List<Patient> temp = null;
+                            if (!isCancelled()) {
+                                if (patients == null) {
+                                    patients = patientController.getPatients(nextPageToLoad, pageSize);
+                                } else {
+                                    temp = patientController.getPatients(nextPageToLoad, pageSize);
+                                    if (temp != null) {
+                                        patients.addAll(temp);
+                                    }
+                                }
+                            }
+                        }
+                    }else{
+                        if(!isSubsequentLazyFetchQuery) {
+                            totalPageCountMap.clear();
+                            patientCount = 0;
+                            totalPageCount = 0;
+
+                            int pageCountForCohort = 0;
+                            int uiPageNumber = 0;
+                            for (String cohortUuid : cohortUuidsInActiveConfig) {
+                                pageCountForCohort = patientController.countPatients(cohortUuid);
+                                patientCount += pageCountForCohort;
+                                int pages = new Double(Math.ceil((float) pageCountForCohort / pageSize)).intValue();
+                                for (int page = 1; page <= pages; page++) {
+                                    PatientFilterPageNumberMap patientFilterPageNumberMap = new PatientFilterPageNumberMap();
+                                    patientFilterPageNumberMap.setFilterObject(cohortUuid);
+                                    patientFilterPageNumberMap.setPageNumber(page);
+
+                                    totalPageCountMap.put(++uiPageNumber, patientFilterPageNumberMap);
+                                    totalPageCount++;
+                                }
+                            }
+                        }
+                        PatientFilterPageNumberMap patientFilterPageNumberMap = totalPageCountMap.get(nextPageToLoad);
+                        if(patientFilterPageNumberMap != null) {
+                            String cohortUuid = (String) patientFilterPageNumberMap.getFilterObject();
+                            int page = patientFilterPageNumberMap.getPageNumber();
+
+                            List<Patient> temp = null;
+
+                            if (!isCancelled()) {
+                                if (patients == null) {
+                                    patients = patientController.getPatients(cohortUuid, page, pageSize);
+                                    if (patients != null) {
+                                    }
+                                } else {
+                                    temp = patientController.getPatients(cohortUuid, page, pageSize);
+                                    if (temp != null) {
+                                        patients.addAll(temp);
+                                    }
                                 }
                             }
                         }
@@ -342,8 +388,23 @@ public class PatientsLocalSearchAdapter extends PatientAdapterHelper implements 
             } catch (PatientController.PatientLoadException e) {
                 Log.e(getClass().getSimpleName(), "Exception occurred while fetching patients", e);
             }
+
+            if(patients == null) patients = new ArrayList<>();
             List<String> tags = patientController.getSelectedTagUuids();
             filteredPatients = patientController.filterPatientByTags(patients,tags);
+
+            try {
+                List<String> tagsToHidePatients = muzimaSettingController.getTagsForPatientsToHide();
+                List<String> nonSelectedTagsToHidePatients = new ArrayList<>();
+                List<String> tagsToRetain = patientController.getSelectedTagUuids();
+                for(String tagToHide: tagsToHidePatients){
+                    if(!tagsToRetain.contains(tagToHide))
+                        nonSelectedTagsToHidePatients.add(tagToHide);
+                }
+                filteredPatients = patientController.removePatientsWithTags(filteredPatients, nonSelectedTagsToHidePatients);
+            } catch (MuzimaSettingController.MuzimaSettingFetchException e) {
+                Log.e(getClass().getSimpleName(), "Error tags list for patient sto hide setting", e);
+            }
             return filteredPatients;
         }
 
