@@ -904,7 +904,6 @@
     <string name="error_media_category_save">Hitilafu ilitokea wakati wa kuhifadhi kategoria ya midia</string>
     <string name="general_program_selection">Uteuzi wa Mpango</string>
     <string name="general_switch_program">Badilisha Mpango</string>
-    <string name="general_no_intervention_needed">hakuna ziara inahitajika</string>
     <string name="switch_program">Mudar Perfil</string>
     <string name="sync_server_side_cohort_definition_running_error">Can not performe sync action now because there is a Cohort Definition running, try again later.</string>
 </resources>

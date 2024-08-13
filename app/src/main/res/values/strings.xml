@@ -904,7 +904,6 @@ O aplicativo mUzima for Health Providers (o \"Aplicativo\") é desenvolvido como
     <string name="switch_program">Mudar Perfil</string>
     <string name="sync_server_side_cohort_definition_running_error">Can not performe sync action now because there is a Cohort Definition running, try again later.</string>
     <string name="general_no_intervention_needed">No intervention needed</string>
-    <string name="general_no_intervention_needed">No intervention needed</string>
     <string name="error_cohort_delete">An error occurred while deleting cohort</string>
     <string name="error_patient_delete">An error occurred when deleting patient</string>
     <string name="error_location_delete">An error occurred when deleting location</string>

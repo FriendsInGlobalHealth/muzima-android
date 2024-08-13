@@ -889,7 +889,6 @@
     <string name="error_patient_fetch">દર્દીઓને લાવવામાં કંઈક ખોટું થયું</string>
     <string name="error_setup_fetch">સેટઅપ રૂપરેખાઓ આનયન કરતી વખતે કંઈક ખોટું થયું</string>
     <string name="general_no_intervention_needed">કોઈ હસ્તક્ષેપની જરૂર નથી</string>
-    <string name="general_no_intervention_needed">કોઈ હસ્તક્ષેપની જરૂર નથી</string>
     <string name="error_cohort_delete">સમૂહને કાઢી નાખતી વખતે એક ભૂલ આવી</string>
     <string name="error_patient_delete">દર્દીને કાઢી નાખતી વખતે ભૂલ આવી</string>
     <string name="error_location_delete">સ્થાન કાઢી નાખતી વખતે એક ભૂલ આવી</string>

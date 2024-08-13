@@ -899,7 +899,6 @@ O aplicativo mUzima for Health Providers (o \"Aplicativo\") é desenvolvido como
     <string name="general_no_intervention_needed">"Nao há necessidade de visita "</string>
     <string name="sync_server_side_cohort_definition_running_error">Não é possível sincronizar dados agora pois há uma coorte sendo executada no servidor agora, por favor tente mais tarde.</string>
     <string name="switch_program">Mudar Perfil</string>
-    <string name="general_no_intervention_needed">"Nao há necessidade de visita "</string>
     <string name="error_cohort_delete">Ocorreu um erro ao excluir a coorte</string>
     <string name="error_patient_delete">Ocorreu um erro ao excluir o paciente</string>
     <string name="error_location_delete">Ocorreu um erro ao excluir o local</string>
