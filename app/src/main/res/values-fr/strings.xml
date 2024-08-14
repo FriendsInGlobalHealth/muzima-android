@@ -912,4 +912,6 @@
     <string name="general_switch_program">Changer de programme</string>
     <string name="switch_program">Mudar Perfil</string>
     <string name="sync_server_side_cohort_definition_running_error">Can not performe sync action now because there is a Cohort Definition running, try again later.</string>
+    <string name="tente_sincronizar_mais_tarde_a_coorte_est_em_processo_de_execu_o_no_sesp">Tente sincronizar mais tarde, a coorte está em processo de execução no SESP.</string>
+    <string name="n_o_foi_possivel_obter_o_status_de_execu_o_das_coortes_no_sesp">Não foi possivel obter o status de execução das coortes no SESP.</string>
 </resources>

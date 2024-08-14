@@ -912,4 +912,6 @@ O aplicativo mUzima for Health Providers (o \"Aplicativo\") é desenvolvido como
     <string name="error_media_category_save">Ocorreu um erro ao salvar a categoria de mídia</string>
     <string name="general_program_selection">Selecção de perfil</string>
     <string name="general_switch_program">Trocar perfil</string>
+    <string name="tente_sincronizar_mais_tarde_a_coorte_est_em_processo_de_execu_o_no_sesp">Tente sincronizar mais tarde, a coorte está em processo de execução no SESP.</string>
+    <string name="n_o_foi_possivel_obter_o_status_de_execu_o_das_coortes_no_sesp">Não foi possivel obter o status de execução das coortes no SESP.</string>
 </resources>

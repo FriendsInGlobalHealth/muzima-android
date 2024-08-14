@@ -53,6 +53,7 @@ import com.muzima.controller.LocationController;
 import com.muzima.controller.MediaCategoryController;
 import com.muzima.controller.MediaController;
 import com.muzima.controller.MinimumSupportedAppVersionController;
+import com.muzima.controller.MuzimaCohortExecutionStatusController;
 import com.muzima.controller.MuzimaHTCFormController;
 import com.muzima.controller.MuzimaSettingController;
 import com.muzima.controller.ObservationController;
@@ -137,6 +138,7 @@ public class MuzimaApplication extends MultiDexApplication {
     private MediaCategoryController mediaCategoryController;
     private ExecutorService executorService;
     private FormDuplicateCheckPreferenceService formDuplicateCheckPreferenceService;
+    private MuzimaCohortExecutionStatusController muzimaCohortExecutionStatusController;
 
     public void clearApplicationData() {
         try {
@@ -268,6 +270,17 @@ public class MuzimaApplication extends MultiDexApplication {
             }
         }
         return formController;
+    }
+
+    public MuzimaCohortExecutionStatusController getMuzimaCohortExecutionStatusController() {
+        if (muzimaCohortExecutionStatusController == null) {
+            try {
+                muzimaCohortExecutionStatusController = new MuzimaCohortExecutionStatusController(this);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return muzimaCohortExecutionStatusController;
     }
 
     public CohortController getCohortController() {
