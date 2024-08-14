@@ -154,7 +154,7 @@ public class MuzimaLoggerService {
                     return loggingFeatureSetting.getValueBoolean();
                 }
             } catch (MuzimaSettingController.MuzimaSettingFetchException e) {
-                Log.e("MuzimaLoggerService", "Could not fetch setting", e);
+                Log.d("MuzimaLoggerService", "Could not fetch setting", e);
             }
         }
         return false;

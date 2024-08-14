@@ -32,6 +32,7 @@ import com.muzima.R;
 import com.muzima.adapters.setupconfiguration.SetupConfigurationRecyclerViewAdapter;
 import com.muzima.api.model.MuzimaSetting;
 import com.muzima.api.model.SetupConfiguration;
+import com.muzima.api.model.User;
 import com.muzima.tasks.DownloadSetupConfigurationsTask;
 import com.muzima.utils.KeyboardWatcher;
 import com.muzima.utils.ThemeUtils;
@@ -73,6 +74,7 @@ public class SetupMethodPreferenceWizardActivity extends BroadcastListenerActivi
                 .execute(new DownloadSetupConfigurationsTask(getApplicationContext(), new DownloadSetupConfigurationsTask.SetupConfigurationCompletedCallback() {
                     @Override
                     public void setupConfigDownloadCompleted(final List<SetupConfiguration> configurationList, final MuzimaSetting multipleConfigsSupportSetting) {
+                        User authenticatedUser = ((MuzimaApplication) getApplicationContext()).getAuthenticatedUser();
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -95,7 +97,7 @@ public class SetupMethodPreferenceWizardActivity extends BroadcastListenerActivi
                                     MuzimaApplication muzimaApplication = (MuzimaApplication) getApplicationContext();
                                     if (multipleConfigsSupportSetting != null && multipleConfigsSupportSetting.getValueBoolean()) {
                                         for (SetupConfiguration config : configurationList) {
-                                            if (StringUtils.contains(config.getAssignedUserIds(), muzimaApplication.getAuthenticatedUser().getSystemId())) {
+                                            if (StringUtils.contains(config.getAssignedUserIds(), authenticatedUser.getSystemId())) {
                                                 assignedConfigs.add(config.getUuid());
                                             }
                                         }
