@@ -130,7 +130,7 @@ public class MuzimaSettingController {
             try{
                 activeSetupConfig = muzimaApplication.getSetupConfigurationController().getActiveSetupConfigurationTemplate();
             } catch (SetupConfigurationController.SetupConfigurationFetchException e) {
-                Log.e(getClass().getSimpleName(), "Cannot load active config",e);
+                Log.d(getClass().getSimpleName(), "Cannot load active config",e);
             }
 
             if(activeSetupConfig == null){
