@@ -77,7 +77,7 @@ public class HTCMainActivity extends BroadcastListenerActivity {
 
         this.user = ((MuzimaApplication) getApplication()).getAuthenticatedUser();
         this.userName = findViewById(R.id.user_name);
-        this.userName.setText(getResources().getString(R.string.welcome_message)+this.user.getUsername());
+        if (this.user != null) this.userName.setText(getResources().getString(R.string.welcome_message)+this.user.getUsername());
 
         toolbar = findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);

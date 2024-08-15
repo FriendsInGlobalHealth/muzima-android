@@ -295,7 +295,68 @@ public class GuidedConfigurationWizardActivity extends BroadcastListenerActivity
 
     private void initiateSetupConfiguration() {
         fetchConfigurationTemplates();
+        checkCohortExecutionStatus();
         downloadSettings();
+    }
+
+    private void checkCohortExecutionStatus() {
+        /*final SetupActionLogModel downloadHtcPersonsLog = new SetupActionLogModel();
+        addSetupActionLog(downloadHtcPersonsLog);
+        new MuzimaAsyncTask<Void, Void, int[]>() {
+            @Override
+            protected void onPreExecute() {
+                downloadHtcPersonsLog.setSetupAction(getString(R.string.info_htc_persons_download));
+                onQueryTaskStarted();
+            }
+
+            @Override
+            protected int[] doInBackground(Void... voids) {
+                User authenticatedUser = ((MuzimaApplication) getApplication()).getAuthenticatedUser();
+
+                if (authenticatedUser.getUuid() != null) {
+                    MuzimaSyncService muzimaSyncService = ((MuzimaApplication) getApplicationContext()).getMuzimaSyncService();
+
+                    int[] resultForHtcPersons = muzimaSyncService.downloadHtcPersons(authenticatedUser.getUuid());
+
+                    return resultForHtcPersons;
+
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(int[] result) {
+                String resultDescription = null;
+                String resultStatus = null;
+                if (result == null) {
+                    resultDescription = getString(R.string.info_htc_person_not_downloaded);
+                    resultStatus = Constants.SetupLogConstants.ACTION_SUCCESS_STATUS_LOG;
+                } else if (result[0] == Constants.DataSyncServiceConstants.SyncStatusConstants.SUCCESS) {
+                    if (result[1] == 1) {
+                        resultDescription = getString(R.string.info_htc_person_downloaded);
+                    } else {
+                        resultDescription = getString(R.string.info_htc_persons_downloaded, result[3]);
+                    }
+                    resultStatus = Constants.SetupLogConstants.ACTION_SUCCESS_STATUS_LOG;
+                } else  {
+                    wizardcompletedSuccessfully = false;
+                    resultDescription = getString(R.string.error_htc_persons_download);
+                    resultStatus = Constants.SetupLogConstants.ACTION_FAILURE_STATUS_LOG;
+                }
+                downloadHtcPersonsLog.setSetupActionResult(resultDescription);
+                downloadHtcPersonsLog.setSetupActionResultStatus(resultStatus);
+                onQueryTaskFinish();
+
+                if (setupConfigTemplateUuidList.size() > 1) {
+                    downloadCohorts();
+                }
+            }
+
+            @Override
+            protected void onBackgroundError(Exception e) {
+
+            }
+        }.execute();*/
     }
 
     private void fetchConfigurationTemplates() {
@@ -1511,7 +1572,7 @@ public class GuidedConfigurationWizardActivity extends BroadcastListenerActivity
 
     private synchronized void evaluateFinishStatus() {
         int TOTAL_WIZARD_STEPS = isOnlineOnlyModeEnabled ? 11 : 14;
-        if (isAtsSetup()) {
+        if (isAtsSetup() && !hasMoreThanOneConfig()) {
             TOTAL_WIZARD_STEPS = 4;
         }
         if (wizardLevel == (TOTAL_WIZARD_STEPS)) {
@@ -1585,7 +1646,7 @@ public class GuidedConfigurationWizardActivity extends BroadcastListenerActivity
     private void updateOnlineOnlyModeSettingValue(){
         isOnlineOnlyModeEnabled = ((MuzimaApplication) getApplicationContext()).getMuzimaSettingController().isOnlineOnlyModeEnabled();
 
-        if (isAtsSetup()) {
+        if (isAtsSetup() && !hasMoreThanOneConfig()) {
             mainProgressbar.setMax(4);
         } else {
             mainProgressbar.setMax(isOnlineOnlyModeEnabled ? 11 : 14);

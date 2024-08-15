@@ -63,14 +63,18 @@ import com.muzima.adapters.patients.PatientTagsListAdapter;
 import com.muzima.api.model.Patient;
 import com.muzima.api.model.PatientIdentifier;
 import com.muzima.api.model.PatientTag;
+import com.muzima.api.model.SetupConfiguration;
+import com.muzima.api.model.SetupConfigurationTemplate;
 import com.muzima.api.model.SmartCardRecord;
 import com.muzima.controller.FormController;
+import com.muzima.controller.MuzimaCohortExecutionStatusController;
 import com.muzima.controller.MuzimaSettingController;
 import com.muzima.controller.PatientController;
 import com.muzima.controller.SetupConfigurationController;
 import com.muzima.domain.Credentials;
 import com.muzima.model.CohortFilter;
 import com.muzima.model.CohortWithFilter;
+import com.muzima.model.SetupActionLogModel;
 import com.muzima.model.events.BottomSheetToggleEvent;
 import com.muzima.model.events.CloseBottomSheetEvent;
 import com.muzima.model.events.CohortFilterActionEvent;
@@ -81,10 +85,12 @@ import com.muzima.scheduler.RealTimeFormUploader;
 import com.muzima.service.TagPreferenceService;
 import com.muzima.service.WizardFinishPreferenceService;
 import com.muzima.tasks.LoadDownloadedCohortsTask;
+import com.muzima.tasks.MuzimaAsyncTask;
 import com.muzima.utils.Constants;
 import com.muzima.utils.LanguageUtil;
 import com.muzima.utils.StringUtils;
 import com.muzima.utils.ThemeUtils;
+import com.muzima.utils.ViewUtil;
 import com.muzima.utils.smartcard.KenyaEmrShrMapper;
 import com.muzima.utils.smartcard.SmartCardIntentIntegrator;
 import com.muzima.utils.smartcard.SmartCardIntentResult;
@@ -105,6 +111,7 @@ public class MainDashboardActivity extends ActivityWithBottomNavigation implemen
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private TextView headerTitleTextView;
+    private TextView headerTitleConfigNameTextView;
     private final LanguageUtil languageUtil = new LanguageUtil();
     private Credentials credentials;
     private BottomSheetBehavior cohortFilterBottomSheetBehavior;
@@ -393,6 +400,7 @@ public class MainDashboardActivity extends ActivityWithBottomNavigation implemen
         filterOptionsRecyclerView.setAdapter(cohortFilterAdapter);
         filterOptionsRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         headerTitleTextView = navigationView.getHeaderView(0).findViewById(R.id.dashboard_header_title_text_view);
+        headerTitleConfigNameTextView = navigationView.getHeaderView(0).findViewById(R.id.dashboard_header_title_config_name_text_view);
 
         FragmentContainerView fragmentContainerView = findViewById(R.id.nav_host_fragment);
 
@@ -457,24 +465,72 @@ public class MainDashboardActivity extends ActivityWithBottomNavigation implemen
         });
 
         cohortFilterBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-        if (((MuzimaApplication) getApplicationContext()).getAuthenticatedUser() != null)
+        if (((MuzimaApplication) getApplicationContext()).getAuthenticatedUser() != null) {
             headerTitleTextView.setText(((MuzimaApplication) getApplicationContext()).getAuthenticatedUser().getUsername());
+
+            try {
+                SetupConfigurationController setupConfigurationController = ((MuzimaApplication) getApplicationContext()).getSetupConfigurationController();
+                SetupConfigurationTemplate template = setupConfigurationController.getActiveSetupConfigurationTemplate();
+                SetupConfiguration setupConfiguration = setupConfigurationController.getSetupConfigurations(template.getUuid());
+                headerTitleConfigNameTextView.setText("(" + setupConfiguration.getName() + ")");
+            } catch (Throwable e) {
+                Log.e(getClass().getSimpleName(),"Cannot fetch active setup config",e);
+            }
+        }
         setTitle(StringUtils.EMPTY);
     }
 
     private void processSync(Animation rotation){
         if(!isDataSyncRunning()) {
-            Toast.makeText(getApplicationContext(), getResources().getString(R.string.info_muzima_sync_service_in_progress), Toast.LENGTH_LONG).show();
-            new MuzimaJobScheduleBuilder(getApplicationContext()).schedulePeriodicBackgroundJob(1000, true);
+            final SetupActionLogModel downloadConceptsLog = new SetupActionLogModel();
+            new MuzimaAsyncTask<Void, Void, int[]>() {
+                @Override
+                protected void onPreExecute() {
+                }
 
-            refreshMenuActionView.startAnimation(rotation);
-            syncReportMenuActionView.setVisibility(View.GONE);
+                @Override
+                protected int[] doInBackground(Void... voids) {
+                    try {
+                        MuzimaCohortExecutionStatusController cohortExecutionStatusController = ((MuzimaApplication) getApplicationContext()).getMuzimaCohortExecutionStatusController();
+                        return cohortExecutionStatusController.cohortInExecution();
+                    } catch (MuzimaCohortExecutionStatusController.MuzimaCohortExecutionStatusFetchException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
 
-            notifySyncStarted();
-            showBackgroundSyncProgressDialog(MainDashboardActivity.this);
+                @Override
+                protected void onPostExecute(int[] result) {
+                    if (result != null && result.length > 0) {
+                        if (result[0] == 1) {
+                            runOnUiThread(() -> ViewUtil.displayAlertDialog(MainDashboardActivity.this, getString(R.string.tente_sincronizar_mais_tarde_a_coorte_est_em_processo_de_execu_o_no_sesp)).show());
+                        } else {
+                            startSync(rotation);
+                        }
+                    } else {
+                        runOnUiThread(() -> ViewUtil.displayAlertDialog(MainDashboardActivity.this, getString(R.string.n_o_foi_possivel_obter_o_status_de_execu_o_das_coortes_no_sesp)).show());
+                    }
+                }
+
+
+                @Override
+                protected void onBackgroundError(Exception e) {
+
+                }
+            }.execute();
         } else {
             showBackgroundSyncProgressDialog(MainDashboardActivity.this);
         }
+    }
+
+    private void startSync(Animation rotation) {
+        Toast.makeText(getApplicationContext(), getResources().getString(R.string.info_muzima_sync_service_in_progress), Toast.LENGTH_LONG).show();
+        new MuzimaJobScheduleBuilder(getApplicationContext()).schedulePeriodicBackgroundJob(1000, true);
+
+        refreshMenuActionView.startAnimation(rotation);
+        syncReportMenuActionView.setVisibility(View.GONE);
+
+        notifySyncStarted();
+        showBackgroundSyncProgressDialog(MainDashboardActivity.this);
     }
 
     protected void updateSyncProgressWidgets(boolean isSyncRunning){

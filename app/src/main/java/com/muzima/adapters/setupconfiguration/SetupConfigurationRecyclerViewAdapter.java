@@ -25,6 +25,8 @@ import com.muzima.MuzimaApplication;
 import com.muzima.R;
 import com.muzima.api.model.SetupConfiguration;
 import com.muzima.controller.MuzimaSettingController;
+import com.muzima.service.ActiveConfigPreferenceService;
+import com.muzima.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +70,10 @@ public class SetupConfigurationRecyclerViewAdapter extends RecyclerView.Adapter<
         SetupConfiguration setupConfiguration = setupConfigurationList.get(position);
         holder.nameTextView.setText(setupConfiguration.getName());
         holder.descriptionTextView.setText(setupConfiguration.getDescription());
-        if (selectedConfigsUuids.contains(setupConfiguration.getUuid())) {
+        ActiveConfigPreferenceService service = new ActiveConfigPreferenceService((MuzimaApplication) context.getApplicationContext());
+        String activeConfigUuid = service.getActiveConfigUuid();
+        if (selectedConfigsUuids.contains(setupConfiguration.getUuid()) ||
+                !StringUtils.isEmpty(activeConfigUuid) && StringUtils.equals(activeConfigUuid, setupConfiguration.getUuid())) {
             holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.primary_blue));
             holder.cardView.setChecked(true);
         } else {
