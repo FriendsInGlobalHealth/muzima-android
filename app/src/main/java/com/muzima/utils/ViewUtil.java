@@ -122,7 +122,7 @@ public class ViewUtil {
      *
      * @param mContext, Context of where to display
      */
-    private static AlertDialog genericDisplayAlertDialog(final Context mContext, final String alertMessage, IDialogListener listener) {
+    public static AlertDialog genericDisplayAlertDialog(final Context mContext, final String alertMessage, IDialogListener listener) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext)
                 .setMessage(alertMessage)

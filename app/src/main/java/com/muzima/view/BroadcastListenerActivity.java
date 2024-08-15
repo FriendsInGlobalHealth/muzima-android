@@ -32,6 +32,7 @@ import android.widget.Toast;
 
 import com.muzima.MuzimaApplication;
 import com.muzima.R;
+import com.muzima.api.model.SetupConfiguration;
 import com.muzima.controller.SetupConfigurationController;
 import com.muzima.utils.Constants;
 import com.muzima.utils.StringUtils;
@@ -286,7 +287,7 @@ public abstract class BroadcastListenerActivity extends BaseAuthenticatedActivit
                 int syncType = intent.getIntExtra(Constants.DataSyncServiceConstants.SYNC_TYPE, -1);
                 int downloadCount = intent.getIntExtra(Constants.DataSyncServiceConstants.DOWNLOAD_COUNT_PRIMARY, 0);
 
-                if (isAtsUser()) {
+                if (isAtsUserOnly()) {
                     switch (syncType) {
                         case Constants.DataSyncServiceConstants.SYNC_HTC_PERSONS:
                             msg = getString(R.string.info_real_time_upload_success);
@@ -336,7 +337,10 @@ public abstract class BroadcastListenerActivity extends BaseAuthenticatedActivit
                             msg = getString(R.string.info_patient_reports_downloaded, downloadCount);
                             break;
                         case Constants.DataSyncServiceConstants.SYNC_HTC_PERSONS:
-                            msg = getString(R.string.info_real_time_upload_success);
+                            if (isAtsUserWithOtherConfig()) {
+                                msg = getString(R.string.info_real_time_upload_success);
+                            }
+                            break;
                     }
                     break;
                 }
@@ -353,9 +357,24 @@ public abstract class BroadcastListenerActivity extends BaseAuthenticatedActivit
         }
     }
 
-    private boolean isAtsUser() {
+    private boolean isAtsUserOnly() {
         try {
-            return ((MuzimaApplication)getApplication()).getSetupConfigurationController().getAllSetupConfigurations().get(0).getUuid().equals("1eaa9574-fa5a-4655-bd63-466b538c5b5d");
+            List<SetupConfiguration> setupConfigurations = ((MuzimaApplication)getApplication()).getSetupConfigurationController().getAllSetupConfigurations();
+            return setupConfigurations != null && setupConfigurations.size() == 1 && setupConfigurations.get(0).getUuid().equals("1eaa9574-fa5a-4655-bd63-466b538c5b5d");
+        } catch (SetupConfigurationController.SetupConfigurationDownloadException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private boolean isAtsUserWithOtherConfig() {
+        try {
+            List<SetupConfiguration> setupConfigurations = ((MuzimaApplication)getApplication()).getSetupConfigurationController().getAllSetupConfigurations();
+            for (SetupConfiguration setupConfiguration : setupConfigurations) {
+                if (setupConfigurations.size() > 1 && setupConfiguration.getUuid().equals("1eaa9574-fa5a-4655-bd63-466b538c5b5d")) {
+                    return true;
+                }
+            }
+            return false;
         } catch (SetupConfigurationController.SetupConfigurationDownloadException e) {
             throw new RuntimeException(e);
         }

@@ -249,7 +249,7 @@ public class HTCFormActivity extends AppCompatActivity {
                             Log.e(getClass().getSimpleName(), "UUID e ID : " + createdHTCForm.getUuid() + " - " + createdHTCForm.getId());
                             searchResults.add(new PatientItem(createdHTCPerson));
 
-                            ViewUtil.displayAlertDialog(HTCFormActivity.this,getResources().getString(R.string.record_saved_sucessfull)).show();
+                            //ViewUtil.displayAlertDialog(HTCFormActivity.this,getResources().getString(R.string.record_saved_sucessfull)).show();
                             goToMainActivity(searchResults);
                         }
                     }
