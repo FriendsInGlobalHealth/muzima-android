@@ -679,7 +679,7 @@ O aplicativo mUzima for Health Providers (o \"Aplicativo\") é desenvolvido como
     <string name="shr_registration_description">Dados de registro de SHR</string>
     <string name="success_writing_smartcard">Os dados do cartão inteligente foram escritos com sucesso.</string>
     <string name="title_about_dashboard_help_html">Sobre o Painel de Controle</string>
-    <string name="title_active_setup_config">Configuração de configuração ativa</string>
+    <string name="title_active_setup_config">Perfil activo</string>
     <string name="title_activity_audio">Adicionar Audio</string>
     <string name="title_activity_client_reports">Client Reports</string>
     <string name="title_activity_client_summary">Sumário do Utente</string>
