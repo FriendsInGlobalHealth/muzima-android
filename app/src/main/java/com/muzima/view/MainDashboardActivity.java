@@ -482,7 +482,6 @@ public class MainDashboardActivity extends ActivityWithBottomNavigation implemen
 
     private void processSync(Animation rotation){
         if(!isDataSyncRunning()) {
-            final SetupActionLogModel downloadConceptsLog = new SetupActionLogModel();
             new MuzimaAsyncTask<Void, Void, int[]>() {
                 @Override
                 protected void onPreExecute() {

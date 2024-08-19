@@ -66,8 +66,10 @@ import com.muzima.api.service.LastSyncTimeService;
 import com.muzima.controller.AppUsageLogsController;
 import com.muzima.controller.FormController;
 import com.muzima.controller.LocationController;
+import com.muzima.controller.MuzimaCohortExecutionStatusController;
 import com.muzima.controller.MuzimaSettingController;
 import com.muzima.controller.SetupConfigurationController;
+import com.muzima.listners.IDialogListener;
 import com.muzima.model.SetupActionLogModel;
 import com.muzima.service.DefaultEncounterLocationPreferenceService;
 import com.muzima.service.MuzimaSyncService;
@@ -79,6 +81,7 @@ import com.muzima.utils.Constants.DataSyncServiceConstants.SyncStatusConstants;
 import com.muzima.utils.Constants.SetupLogConstants;
 import com.muzima.utils.MemoryUtil;
 import com.muzima.utils.ThemeUtils;
+import com.muzima.utils.ViewUtil;
 import com.muzima.view.BroadcastListenerActivity;
 import com.muzima.view.MainDashboardActivity;
 import com.muzima.view.login.ActiveConfigSelectionActivity;
@@ -100,7 +103,7 @@ import java.util.UUID;
 import com.muzima.utils.DeviceDetailsUtil;
 
 @SuppressWarnings("staticFieldLeak")
-public class GuidedConfigurationWizardActivity extends BroadcastListenerActivity implements ListAdapter.BackgroundListQueryTaskListener {
+public class GuidedConfigurationWizardActivity extends BroadcastListenerActivity implements ListAdapter.BackgroundListQueryTaskListener, IDialogListener {
     public static final String SETUP_CONFIG_UUID_INTENT_KEY = "SETUP_CONFIG_UUID";
     private List<SetupConfigurationTemplate> setupConfigurationTemplateList = new ArrayList<>();
     private int wizardLevel = 0;
@@ -296,67 +299,54 @@ public class GuidedConfigurationWizardActivity extends BroadcastListenerActivity
     private void initiateSetupConfiguration() {
         fetchConfigurationTemplates();
         checkCohortExecutionStatus();
-        downloadSettings();
+        //downloadSettings();
     }
 
     private void checkCohortExecutionStatus() {
-        /*final SetupActionLogModel downloadHtcPersonsLog = new SetupActionLogModel();
-        addSetupActionLog(downloadHtcPersonsLog);
         new MuzimaAsyncTask<Void, Void, int[]>() {
             @Override
             protected void onPreExecute() {
-                downloadHtcPersonsLog.setSetupAction(getString(R.string.info_htc_persons_download));
-                onQueryTaskStarted();
             }
 
             @Override
             protected int[] doInBackground(Void... voids) {
-                User authenticatedUser = ((MuzimaApplication) getApplication()).getAuthenticatedUser();
-
-                if (authenticatedUser.getUuid() != null) {
-                    MuzimaSyncService muzimaSyncService = ((MuzimaApplication) getApplicationContext()).getMuzimaSyncService();
-
-                    int[] resultForHtcPersons = muzimaSyncService.downloadHtcPersons(authenticatedUser.getUuid());
-
-                    return resultForHtcPersons;
-
+                try {
+                    MuzimaCohortExecutionStatusController cohortExecutionStatusController = ((MuzimaApplication) getApplicationContext()).getMuzimaCohortExecutionStatusController();
+                    return cohortExecutionStatusController.cohortInExecution();
+                } catch (MuzimaCohortExecutionStatusController.MuzimaCohortExecutionStatusFetchException e) {
+                    throw new RuntimeException(e);
                 }
-                return null;
             }
 
             @Override
             protected void onPostExecute(int[] result) {
-                String resultDescription = null;
-                String resultStatus = null;
-                if (result == null) {
-                    resultDescription = getString(R.string.info_htc_person_not_downloaded);
-                    resultStatus = Constants.SetupLogConstants.ACTION_SUCCESS_STATUS_LOG;
-                } else if (result[0] == Constants.DataSyncServiceConstants.SyncStatusConstants.SUCCESS) {
-                    if (result[1] == 1) {
-                        resultDescription = getString(R.string.info_htc_person_downloaded);
+                if (result != null && result.length > 0) {
+                    if (result[0] == 1) {
+                        runOnUiThread(() -> ViewUtil.genericDisplayAlertDialog(GuidedConfigurationWizardActivity.this, getString(R.string.tente_sincronizar_mais_tarde_a_coorte_est_em_processo_de_execu_o_no_sesp), GuidedConfigurationWizardActivity.this).show());
                     } else {
-                        resultDescription = getString(R.string.info_htc_persons_downloaded, result[3]);
+                        downloadSettings();
                     }
-                    resultStatus = Constants.SetupLogConstants.ACTION_SUCCESS_STATUS_LOG;
-                } else  {
-                    wizardcompletedSuccessfully = false;
-                    resultDescription = getString(R.string.error_htc_persons_download);
-                    resultStatus = Constants.SetupLogConstants.ACTION_FAILURE_STATUS_LOG;
-                }
-                downloadHtcPersonsLog.setSetupActionResult(resultDescription);
-                downloadHtcPersonsLog.setSetupActionResultStatus(resultStatus);
-                onQueryTaskFinish();
-
-                if (setupConfigTemplateUuidList.size() > 1) {
-                    downloadCohorts();
+                } else {
+                    runOnUiThread(() -> ViewUtil.genericDisplayAlertDialog(GuidedConfigurationWizardActivity.this, getString(R.string.n_o_foi_possivel_obter_o_status_de_execu_o_das_coortes_no_sesp), GuidedConfigurationWizardActivity.this).show());
                 }
             }
+
 
             @Override
             protected void onBackgroundError(Exception e) {
 
             }
-        }.execute();*/
+        }.execute();
+    }
+
+    @Override
+    public void doOnConfirmed() {
+        finishAffinity();
+    }
+
+    @Override
+    public void doOnDeny() {
+
     }
 
     private void fetchConfigurationTemplates() {
