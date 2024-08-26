@@ -11,8 +11,6 @@
 package com.muzima.controller;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.muzima.MuzimaApplication;
@@ -20,15 +18,14 @@ import com.muzima.api.model.Cohort;
 import com.muzima.api.model.CohortData;
 import com.muzima.api.model.CohortMember;
 import com.muzima.api.model.LastSyncTime;
-import com.muzima.api.model.MuzimaSetting;
 import com.muzima.api.model.Provider;
 import com.muzima.api.model.SetupConfigurationTemplate;
 import com.muzima.api.model.User;
 import com.muzima.api.service.CohortService;
 import com.muzima.api.service.LastSyncTimeService;
-import com.muzima.model.ConceptIcons;
 import com.muzima.service.SntpService;
 import com.muzima.util.JsonUtils;
+import com.muzima.utils.MuzimaPreferences;
 import com.muzima.utils.StringUtils;
 
 import java.io.IOException;
@@ -56,8 +53,7 @@ public class CohortController {
 
     public String getDefaultLocation() {
         Context context = muzimaApplication.getApplicationContext();
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String setDefaultLocation = preferences.getString("defaultEncounterLocation", null);
+        String setDefaultLocation = MuzimaPreferences.getStringPreference(context, "defaultEncounterLocation", null);
         if (setDefaultLocation == null) {
             setDefaultLocation = null;
         }
