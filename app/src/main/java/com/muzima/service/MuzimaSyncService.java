@@ -2700,7 +2700,7 @@ public class MuzimaSyncService {
     private List<String> getConceptUuidsFromDerivedConcepts(List<DerivedConcept> derivedConcepts) {
         List<String> conceptUuids = new ArrayList<>();
         for (DerivedConcept derivedConcept : derivedConcepts) {
-            conceptUuids.add(derivedConcept.getUuid());
+            conceptUuids.add(derivedConcept.getDerivedConceptUuid());
         }
         return conceptUuids;
     }
