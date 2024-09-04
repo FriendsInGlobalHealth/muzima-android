@@ -565,6 +565,7 @@ public class MuzimaSyncService {
         try {
             long startDownloadCohortData = System.currentTimeMillis();
 
+
             List<CohortData> cohortDataList = cohortController.downloadCohortData(cohortUuids, getDefaultLocation());
 
             long endDownloadCohortData = System.currentTimeMillis();
@@ -599,7 +600,7 @@ public class MuzimaSyncService {
             result[3] = voidedPatients.size();
 
             if(cohortUuids.length > 0) {
-               // downloadRelationshipsForPatientsByCohortUUIDs(cohortUuids);
+               downloadRelationshipsForPatientsByCohortUUIDs(cohortUuids);
             }
             MuzimaSettingController muzimaSettingController = muzimaApplication.getMuzimaSettingController();
             if(muzimaSettingController.isPatientTagGenerationEnabled()) {
@@ -615,7 +616,7 @@ public class MuzimaSyncService {
             }
 
             //update memberships
-            //downloadRemovedCohortMembershipData(cohortUuids);
+            downloadRemovedCohortMembershipData(cohortUuids);
 
             cohortController.markAsUpToDate(cohortUuids);
             cohortController.setSyncStatus(cohortUuids,1);
