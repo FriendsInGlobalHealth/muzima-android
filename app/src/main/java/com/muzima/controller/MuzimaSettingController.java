@@ -210,8 +210,6 @@ public class MuzimaSettingController {
     public void saveOrUpdateSetting(MuzimaSetting setting) throws MuzimaSettingSaveException {
         if(setting!=null) {
             try {
-
-
                 MuzimaSetting preExistingSetting = settingService.getSettingByProperty(setting.getProperty());
                 if (preExistingSetting != null) {
                     settingService.updateSetting(setting);
@@ -236,10 +234,8 @@ public class MuzimaSettingController {
                             }
                             muzimaApplication.startActivity(intent);
                         }
-
                     }
                 } else {
-
                     settingService.saveSetting(setting);
                 }
 
