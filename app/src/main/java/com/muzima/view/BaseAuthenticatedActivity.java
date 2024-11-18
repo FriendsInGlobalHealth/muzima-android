@@ -14,6 +14,7 @@ package com.muzima.view;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.WindowManager;
 
 import com.muzima.MuzimaApplication;
 import com.muzima.R;
@@ -36,6 +37,7 @@ public class BaseAuthenticatedActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
         setupActionBar();
     }
 

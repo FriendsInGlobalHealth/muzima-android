@@ -7,10 +7,14 @@
   ~ with additional health care disclaimer.
   ~ If the user is an entity intending to commercialize any application that uses
   ~ this code in a for-profit venture, please contact the copyright holder.
---><resources>
-    <string name="SHR_card_text">Carta SHR</string>
-    <string name="add_individual_observation_text">Adicionar observação individual</string>
+-->
+<resources>
+    <string name="SHR_card_text">SHR Card</string>
+    <string name="add_individual_observation_text">Add Individual Observation</string>
     <string name="app_name">mUzima</string>
+    <string name="drawer_close" translatable="false">Fechar</string>
+    <string name="default_auto_save_interval" translatable="false">2</string>
+    <string name="default_server" translatable="false">http://10.10.2.17:8088/openmrschabeco</string>
     <string name="app_sub_title">para provedores de saúde</string>
     <string name="app_title">mUzima para Provedores de Saúde</string>
     <string name="app_version">Versão do aplicativo</string>
@@ -60,7 +64,7 @@
     <string name="error_derived_observation_download">Não foi possível baixar observações derivadas para clientes</string>
     <string name="error_encounter_observation_download">Não poderá baixar observações para os utentes</string>
     <string name="error_exception_data_load">Uma excepção de carregamento foi lançada ao carregar os dados</string>
-    <string name="error_exception_data_upload">O servidor não pôde processar os dados do formulário carregados</string>
+    <string name="error_exception_data_upload">Uma excepção foi lançada ao carregar os dados</string>
     <string name="error_form_data_delete">Não poderá apagar alguns dados do formulário</string>
     <string name="error_form_data_processing">Ocorreu um erro ao processar os dados do formulário</string>
     <string name="error_form_download">Não poderá baixar formulários</string>
@@ -234,7 +238,7 @@
     <string name="general_relationship">Relação</string>
     <string name="general_relationship_management">Gestão de Relacionamento</string>
     <string name="general_relationship_management_description">No espaço da saúde, a relação é utilizada para emparelhar / associar duas pessoas cujos cuidados podem estar interligados.</string>
-    <string name="general_relationships">Relacionamentos</string>
+    <string name="general_relationships">Contacto Directo</string>
     <string name="general_reports">Relatórios</string>
     <string name="general_reset">Redefinir</string>
     <string name="general_result">Resultado Teste HIV:</string>
@@ -302,7 +306,7 @@
     <string name="hint_form_download">Por favor seleccione formulários a partir da lista de todos os formulários e clique em baixar</string>
     <string name="hint_form_validation_failure">Existe uma ou mais falhas de validação neste formulário. Por favor revise e reenvie o formulário</string>
     <string name="hint_future_date_validation_failure">Por favor introduza uma data futura</string>
-    <string name="hint_guided_setup">Selecione o perfil no qual irá trabalhar</string>
+    <string name="hint_guided_setup">Seleccione a presente configuração e permita mUzima fazer o resto</string>
     <string name="hint_help_prompt">Por favor insira a sua mensagem</string>
     <string name="hint_image_caption_prompt">Por favor introduza uma legenda para a imagem</string>
     <string name="hint_incomplete_form_unavailable">Formulários incompletos estão disponíveis somente se tiver guardado um formulário preenchido parcialmente</string>
@@ -386,6 +390,7 @@
     <string name="info_derived_observation_patient_not_downloaded">Não baixou nenhuma observação derivada</string>
     <string name="info_derived_observation_patients_downloaded">%d observações derivadas baixadas para 1 cliente</string>
     <string name="info_derived_observations_download_progress">Observações derivadas baixadas para o cliente %d de %d.</string>
+    <string name="info_summaries_download_progress">Sumarios de utentes baixados %d de %d.</string>
     <string name="info_derived_observations_patient_downloaded">1 observação derivada baixada para %d clientes</string>
     <string name="info_derived_observations_patients_downloaded">%d observações derivadas baixadas para %d clientes</string>
     <string name="info_disclaimer">
@@ -393,10 +398,10 @@
         pode ser encontrada em http://mozilla.org/MPL/2.0/.
         \nmUzima também é distribuído sob os termos da seguinte Garantia Adicional de Renúncia e Limitação de Responsabilidade.
         \n
-        
-        
-        
-        
+
+
+
+
         <strong>Isenção de Garantia Adicional e Limitação de Responsabilidade</strong>
                                                 Nos Estados Unidos, ou em quaisquer outras jurisdições onde se possam aplicar, as seguintes isenções da garantia
         e limitação de responsabilidade são aqui incorporadas nos termos e condições de MPL 2.0:
@@ -422,11 +427,11 @@
         \n\n4. Se o utilizador deste aplicativo for uma entidade que pretende comercializar qualquer aplicativo que utilize
         este código em um empreendimento com fins lucrativos, o usuário é obrigado entrar em contacto com o detentor dos
         direitos autorais pelo email info@mUzima.org.
-    
-    
-    
-    
-    
+
+
+
+
+
     </string>
     <string name="info_download_complete">Descarregamento completo com o estado %d</string>
     <string name="info_downloaded_image">Baixou a imagem</string>
@@ -456,7 +461,7 @@
     <string name="info_form_upload_success">Formulários carregados com sucesso</string>
     <string name="info_forms_downloaded">Baixou %d formulários</string>
     <string name="info_forms_unavailable">Nenhum formulário disponível</string>
-    <string name="info_htc_contact_form">Formulário ATS e Adicionar Contacto</string>
+    <string name="info_htc_contact_form">Testagem contacto CI</string>
     <string name="info_incomplete_form">Formulários incompletos</string>
     <string name="info_incomplete_form_unavailable">Nenhum formulário imcompleto</string>
     <string name="info_initial_setup_progress">Correndo a configuração inicial. Por favor espere…</string>
@@ -527,7 +532,7 @@
     <string formatted="false" name="info_relationships_download">Foram baixados %d relacionamentos para %d utente (s).</string>
     <string formatted="false" name="info_relationships_download_progress">Relacionamentos baixados para o utente %d de %d.</string>
     <string formatted="false" name="info_relationships_not_downloaded_progress">Relacionamentos para o utente %d de %d não baixados.</string>
-    <string name="info_relationships_unavailable">Nenhum relacionamento disponível</string>
+    <string name="info_relationships_unavailable">Nenhum contacto disponível</string>
     <string name="info_report_dataset_download_in_progress">Fazendo download de conjuntos de dados de relatórios</string>
     <string name="info_report_dataset_downloaded">Conjuntos de dados de relatório %d baixados</string>
     <string name="info_report_datasets_not_downloaded">Não fez download de nenhum conjunto de dados de relatório</string>
@@ -678,7 +683,7 @@ O aplicativo mUzima for Health Providers (o \"Aplicativo\") é desenvolvido como
     <string name="shr_registration_description">Dados de registro de SHR</string>
     <string name="success_writing_smartcard">Os dados do cartão inteligente foram escritos com sucesso.</string>
     <string name="title_about_dashboard_help_html">Sobre o Painel de Controle</string>
-    <string name="title_active_setup_config">Configuração de configuração ativa</string>
+    <string name="title_active_setup_config">Perfil activo</string>
     <string name="title_activity_audio">Adicionar Audio</string>
     <string name="title_activity_client_reports">Client Reports</string>
     <string name="title_activity_client_summary">Sumário do Utente</string>
@@ -776,36 +781,142 @@ O aplicativo mUzima for Health Providers (o \"Aplicativo\") é desenvolvido como
     <string name="write_shr_to_card_general">Gravar registros de saúde compartilhados no cartão</string>
     <string name="general_choose">Escolher...</string>
     <string name="warning_new_user_login">Você está logado como um novo usuário no aplicativo, o aplicativo será redefinido para uma nova configuração. Você quer prosseguir?</string>
-    <string name="last_allocation_volunteer">Alocado para:</string>
-    <string name="general_open_registration_form">Abrir formulário de inscrição</string>
-    <string name="info_cannot_find_person_on_list">Não consigo encontrar a pessoa na lista.</string>
-    <string name="info_similar_people_found_msg">Abaixo está uma lista de pessoas que parecem semelhantes àquela que você está prestes a criar.</string>
-    <string name="info_similar_people_found_tip">Se a pessoa que você está criando já existir, selecione-a na lista. Caso contrário, clique no botão abaixo para continuar criando uma nova pessoa.</string>
-    <string name="title_found_similar_people">Encontrei pessoas semelhantes</string>
-    <string name="general_person_name">Nome da pessoa:</string>
-    <string name="general_gender">Gênero:</string>
-    <string name="general_male">Macho</string>
-    <string name="general_birthdate">Data de nascimento:</string>
-    <string name="general_proceed">Continuar</string>
-    <string name="general_or_age">Ou Idade:</string>
-    <string name="general_female">Fêmea</string>
-    <string name="general_more">Mais</string>
-    <string name="general_less">Menos</string>
-    <string name="general_not_all_contacts_visited">Nem todos os contatos visitados</string>
-    <string name="error_patient_fetch">Algo deu errado ao buscar pacientes</string>
-    <string name="error_setup_fetch">Algo deu errado ao buscar as configurações de instalação</string>
-    <string name="general_no_intervention_needed">"Nao há necessidade de visita "</string>
-    <string name="error_cohort_delete">Ocorreu um erro ao excluir a coorte</string>
-    <string name="error_patient_delete">Ocorreu um erro ao excluir o paciente</string>
-    <string name="error_location_delete">Ocorreu um erro ao excluir o local</string>
-    <string name="error_provider_delete">Ocorreu um erro ao excluir o provedor</string>
-    <string name="error_cohort_save">Ocorreu um erro ao salvar a coorte</string>
-    <string name="error_concept_save">Ocorreu um erro ao salvar o conceito</string>
-    <string name="error_patient_report_save">Ocorreu um erro ao salvar relatórios de pacientes</string>
-    <string name="error_setup_config_save">Ocorreu um erro ao salvar a configuração do programa</string>
-    <string name="error_settings_save">Ocorreu um erro ao salvar as configurações</string>
-    <string name="error_dataset_save">Ocorreu um erro ao salvar o conjunto de dados do relatório</string>
-    <string name="error_media_category_save">Ocorreu um erro ao salvar a categoria de mídia</string>
-    <string name="general_program_selection">Selecção de perfil</string>
-    <string name="general_switch_program">Trocar perfil</string>
+
+    <string name="general_error">Erro!</string>
+    <string name="attempt_number_limit_reached">Não pode mais criar visitas para este paciente, pois já atingiu o número máximo de tentativa de visitas (3).</string>
+    <string name="visit_made_sucessfully">Visita feita com sucesso!</string>
+    <string name="todos_utentes">Todos os Utentes</string>
+
+    <string name="htc_identification_data">Identificação do Utente</string>
+    <string name="htc_retesting">Retestagem do ATS</string>
+
+    <string name="htc_book_info">Informação do Livro</string>
+    <string name="book_number">Número do livro</string>
+    <string name="book_page_number">Página do livro</string>
+    <string name="book_page_line">Linha</string>
+    <string name="testing_sector">Sector de testagem</string>
+
+    <string name="ats_testing_data">Dados do ATS</string>
+    <string name="testing_date">Data do teste *</string>
+    <string name="select_testing_date">Seleccione a data do teste</string>
+    <string name="pop_keys_miners">Pop Chaves e Mineiros</string>
+    <string name="index_case_contacts">Contacto de Casos Índice</string>
+    <string name="self_test_confirmation">Confirmação de Autoteste</string>
+    <string name="hiv_positive_results">Resultado HIV</string>
+
+    <string name="historical_testing_data">Historial de Testagem</string>
+    <string name="first_time_testing">Testado pela 1ª vez</string>
+    <string name="positive_in_the_past">Positivo no Passado</string>
+
+    <string name="testing_date_format_error">Preencha correctamente a data de teste!</string>
+    <string name="general_success">Sucesso</string>
+    <string name="record_saved_sucessfull">Registo feito com sucesso!</string>
+
+    <string name="htc_person_mandatory_fields">Os campos marcados com * são obrigatórios</string>
+    <string name="htc_person_register">ATS - Registo de Pessoa</string>
+
+    <string name="person_exist_in_sesp_field">Pessoa existe no SESP?</string>
+
+    <string name="htc_person_name_mandatory">Nome é obrigatório, e não pode conter símbolos ou números</string>
+    <string name="htc_person_surname_mandatory">Apelido é obrigatório, e não pode conter símbolos ou números</string>
+    <string name="htc_person_phone_number_error">O telefone deve conter 9 dígitos numéricos, com o primeiro dígito 8</string>
+    <string name="info_htc_person_download">Baixando registos de pessoas testadas</string>
+    <string name="info_htc_persons_download">Baixando Pessoas Testadas</string>
+    <string name="info_htc_person_not_downloaded">Não baixou registos de pessoas testadas</string>
+    <string name="error_htc_persons_download">Não foi possível baixar pessoastestadas</string>
+    <string name="info_htc_person_downloaded">Baixou uma pessoa testada</string>
+    <string name="info_htc_persons_downloaded">Baixou %d pessoas testadas</string>
+    <string name="error_htc_person_download">Não consuguiu baixar pessoas testadas</string>
+    <string name="info_htc_data_upload">Sincronizando novos dados de ATS para o servidor</string>
+    <string name="info_htc_data_upload_success">Sincronização dos dados de ATS efectuada com sucesso.</string>
+    <string name="htc_person_age_error">Idade deve conter no máximo 3 dígitos e deve estar entre 0 e 100</string>
+    <string name="htc_data_register">Formulário do ATS</string>
+    <string name="htc">mUzima ATS</string>
+
+    <string name="general_birth_date">Data de Nascimento *</string>
+    <string name="general_age">Idade *</string>
+    <string name="record_updated_successful">Registo actualizado com sucesso!</string>
+    <string name="htc_save_error">Erro ao gravar ATS!</string>
+    <string name="htc_person_no_identifier">Sem Identificador</string>
+    <string name="htc_search_persons_or_patients">Pesquisa de pessoas/pacientes</string>
+    <string name="welcome_message">Bem vindo, </string>
+    <string name="fill_the_intended_name_to_search_on_sesp">Indique o nome ou identificador da pessoa que pretende pesquisar no SESP!</string>
+    <string name="person_search">Pesquisa de Pessoas/Utentes</string>
+    <string name="no_search_results">Nenhum resultado foi encontrado.</string>
+    <string name="htc_person_gender_mandatory">O sexo é obrigatório.</string>
+    <string name="htc_person_exist_in_sesp_error">Deve indicar a secção ´Pessoa existe no SESP?´</string>
+
+    <string-array name="personExistsInSESPOptions">
+        <item></item>
+        <item>Sim</item>
+        <item>Não</item>
+        <item>Não sei</item>
+    </string-array>
+
+    <string-array name="testingSectors">
+        <item></item>
+        <item>UATS</item>
+        <item>Consultas Externas</item>
+        <item>Triagem</item>
+        <item>Enfermaria</item>
+        <item>Banco de Socorros</item>
+        <item>Outro ATIP</item>
+        <item>SMI</item>
+        <item>TB</item>
+        <item>ATS-C</item>
+        <item>Outro</item>
+    </string-array>
+
+    <string-array name="popKeysMiners">
+        <item></item>
+        <item>MTS</item>
+        <item>HSH</item>
+        <item>PID</item>
+        <item>REC</item>
+        <item>TG</item>
+        <item>MIN</item>
+    </string-array>
+
+    <string-array name="indexCaseContacts">
+        <item></item>
+        <item>Par. Sex</item>
+        <item>Filho &lt;15</item>
+        <item>Mãe/Pai do CI (&lt;15)</item>
+    </string-array>
+    <string name="last_allocation_volunteer">Allocated to:</string>
+    <string name="general_open_registration_form">Open registration form</string>
+    <string name="info_cannot_find_person_on_list">I cannot find the person on the list.</string>
+    <string name="info_similar_people_found_msg">Below is a list of people who seem similar to the one you are about to create.</string>
+    <string name="info_similar_people_found_tip">If the person you are in the process of creating already exists, select them from the list. Otherwise click the button below to continue creating a new person.</string>
+    <string name="title_found_similar_people">Found Similar People</string>
+    <string name="general_person_name">Person Name:</string>
+    <string name="general_gender">Gender:</string>
+    <string name="general_male">Male</string>
+    <string name="general_birthdate">Birthdate:</string>
+    <string name="general_proceed">Proceed</string>
+    <string name="general_or_age">Or Age:</string>
+    <string name="general_female">Female</string>
+    <string name="general_more">More</string>
+    <string name="general_less">Less</string>
+    <string name="general_not_all_contacts_visited">Not All Contacts Visited</string>
+    <string name="error_patient_fetch">Something went wrong while fetching patients</string>
+    <string name="error_setup_fetch">Something went wrong while fetching setup configs</string>
+    <string name="switch_program">Mudar Perfil</string>
+    <string name="sync_server_side_cohort_definition_running_error">Can not performe sync action now because there is a Cohort Definition running, try again later.</string>
+    <string name="general_no_intervention_needed">No intervention needed</string>
+    <string name="error_cohort_delete">An error occurred while deleting cohort</string>
+    <string name="error_patient_delete">An error occurred when deleting patient</string>
+    <string name="error_location_delete">An error occurred when deleting location</string>
+    <string name="error_provider_delete">An error occurred when deleting provider</string>
+    <string name="error_cohort_save">An error occurred when saving cohort</string>
+    <string name="error_concept_save">An error occurred when saving concept</string>
+    <string name="error_patient_report_save">An error occurred when saving patient reports</string>
+    <string name="error_setup_config_save">An error occurred when saving program setup</string>
+    <string name="error_settings_save">An error occurred when saving settings</string>
+    <string name="error_dataset_save">An error occurred when saving report dataset</string>
+    <string name="error_media_category_save">An error occurred when saving media category</string>
+    <string name="general_program_selection">Program Selection</string>
+    <string name="general_switch_program">Switch Program</string>
+    <string name="tente_sincronizar_mais_tarde_a_coorte_est_em_processo_de_execu_o_no_sesp">Tente sincronizar mais tarde, a coorte está em processo de execução no SESP.</string>
+    <string name="n_o_foi_possivel_obter_o_status_de_execu_o_das_coortes_no_sesp">Não foi possivel obter o status de execução das coortes no SESP.</string>
 </resources>

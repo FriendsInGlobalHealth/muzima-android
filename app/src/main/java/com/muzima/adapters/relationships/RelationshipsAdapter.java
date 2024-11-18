@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import com.muzima.MuzimaApplication;
 import com.muzima.R;
+
 import com.muzima.adapters.RecyclerAdapter;
 import com.muzima.api.model.Concept;
 import com.muzima.api.model.Observation;
@@ -50,10 +51,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import static com.muzima.utils.ConceptUtils.getConceptNameFromConceptNamesByLocale;
-import static com.muzima.utils.DateUtils.SIMPLE_DAY_MONTH_YEAR_DATE_FORMAT;
-
 import org.json.JSONException;
+
+import com.muzima.utils.ConceptUtils;
 
 public class RelationshipsAdapter extends RecyclerAdapter<Relationship> {
     private BackgroundListQueryTaskListener backgroundListQueryTaskListener;
@@ -130,9 +130,12 @@ public class RelationshipsAdapter extends RecyclerAdapter<Relationship> {
                 holder.age.setText(String.format(""));
             }
 
-            if(relationship.getPersonB().getGender() != null) {
+            if(relationship.getPersonB().getGender() != null && !StringUtils.isEmpty(relationship.getPersonB().getGender())) {
                 int genderDrawable = relationship.getPersonB().getGender().equalsIgnoreCase("M") ? R.drawable.gender_male : R.drawable.gender_female;
                 holder.genderImg.setImageDrawable(context.getResources().getDrawable(genderDrawable));
+            }
+            else{
+                holder.genderImg.setImageDrawable(context.getResources().getDrawable(R.drawable.generic_person));
             }
             try {
                 Patient p = patientController.getPatientByUuid(relationship.getPersonB().getUuid());
@@ -159,9 +162,12 @@ public class RelationshipsAdapter extends RecyclerAdapter<Relationship> {
                 holder.age.setText(String.format(""));
             }
 
-            if(relationship.getPersonA().getGender() != null) {
+            if(relationship.getPersonA().getGender() != null && !StringUtils.isEmpty(relationship.getPersonA().getGender())) {
                 int genderDrawable = relationship.getPersonA().getGender().equalsIgnoreCase("M") ? R.drawable.gender_male : R.drawable.gender_female;
                 holder.genderImg.setImageDrawable(context.getResources().getDrawable(genderDrawable));
+            }
+            else{
+                holder.genderImg.setImageDrawable(context.getResources().getDrawable(R.drawable.generic_person));
             }
             try {
                 Patient p = patientController.getPatientByUuid(relationship.getPersonA().getUuid());
@@ -180,6 +186,7 @@ public class RelationshipsAdapter extends RecyclerAdapter<Relationship> {
             holder.hivCareDetails.setVisibility(View.GONE);
         }else {
             String applicationLanguage = MuzimaPreferences.getStringPreference(context, context.getResources().getString(R.string.preference_app_language), context.getResources().getString(R.string.language_english));
+
             try {
                 holder.testDate.setText(getObsDateTimeByPatientUuidAndConceptId(relatedPersonUuid, 23779, observationController, conceptController, applicationLanguage));
                 holder.results.setText(getObsByPatientUuidAndConceptId(relatedPersonUuid, 23779, observationController, conceptController, applicationLanguage));
@@ -240,9 +247,9 @@ public class RelationshipsAdapter extends RecyclerAdapter<Relationship> {
             if(observations.size()>0){
                 Observation obs = observations.get(0);
                 if(concept.isDatetime())
-                    return DateUtils.getFormattedDate(obs.getValueDatetime(),SIMPLE_DAY_MONTH_YEAR_DATE_FORMAT);
+                    return DateUtils.getFormattedDate(obs.getValueDatetime(), DateUtils.SIMPLE_DAY_MONTH_YEAR_DATE_FORMAT);
                 else if(concept.isCoded())
-                    return getConceptNameFromConceptNamesByLocale(obs.getValueCoded().getConceptNames(),applicationLanguage);
+                    return ConceptUtils.getConceptNameFromConceptNamesByLocale(obs.getValueCoded().getConceptNames(),applicationLanguage);
                 else if(concept.isNumeric())
                     return String.valueOf(obs.getValueNumeric());
                 else
@@ -261,7 +268,7 @@ public class RelationshipsAdapter extends RecyclerAdapter<Relationship> {
             Collections.sort(observations, observationDateTimeComparator);
             if(observations.size()>0){
                 Observation obs = observations.get(0);
-                return DateUtils.getFormattedDate(obs.getObservationDatetime(),SIMPLE_DAY_MONTH_YEAR_DATE_FORMAT);
+                return DateUtils.getFormattedDate(obs.getObservationDatetime(), DateUtils.SIMPLE_DAY_MONTH_YEAR_DATE_FORMAT);
             }
         } catch (ObservationController.LoadObservationException | Exception  e) {
             Log.e(getClass().getSimpleName(), "Exception occurred while loading observations", e);
@@ -371,6 +378,7 @@ public class RelationshipsAdapter extends RecyclerAdapter<Relationship> {
                 tagsLayout.removeView(tag);
             }
             tags.removeAll(tagsToRemove);
+            tagsLayout.removeAllViews();
         }
     }
 
@@ -401,6 +409,9 @@ public class RelationshipsAdapter extends RecyclerAdapter<Relationship> {
                     }
                     holder.removeTags(tagsToRemove);
                 }
+            } else {
+                holder.tags.clear();
+                holder.tagsLayout.removeAllViews();
             }
         }
     }
@@ -425,7 +436,7 @@ public class RelationshipsAdapter extends RecyclerAdapter<Relationship> {
         protected List<Relationship> doInBackground(String... params) {
             List<Relationship> relationships = null;
             try {
-               relationships = relationshipController.getRelationshipsForPerson(patientUuid);
+                relationships = relationshipController.getRelationshipsForPerson(patientUuid);
 
             }catch(RelationshipController.RetrieveRelationshipException e){
                 Log.e(this.getClass().getSimpleName(),"Could not get relationship for patient",e);
@@ -463,8 +474,8 @@ public class RelationshipsAdapter extends RecyclerAdapter<Relationship> {
     }
 
     public Relationship getRelationship(int position){
-       Relationship relationship =  relationshipList.get(position);
-       return relationship;
+        Relationship relationship =  relationshipList.get(position);
+        return relationship;
     }
 
     public void toggleSelection(View view, int position){

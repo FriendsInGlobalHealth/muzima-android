@@ -54,6 +54,7 @@ import com.muzima.api.context.MuzimaContext;
 import com.muzima.api.model.AppRelease;
 import com.muzima.api.model.AppUsageLogs;
 import com.muzima.api.model.MinimumSupportedAppVersion;
+import com.muzima.api.model.MuzimaSetting;
 import com.muzima.controller.AppUsageLogsController;
 import com.muzima.controller.AppReleaseController;
 import com.muzima.controller.MinimumSupportedAppVersionController;
@@ -84,6 +85,7 @@ import com.muzima.view.MainDashboardActivity;
 import com.muzima.view.barcode.BarcodeCaptureActivity;
 import com.muzima.view.help.HelpActivity;
 import com.muzima.view.initialwizard.SetupMethodPreferenceWizardActivity;
+import com.muzima.view.main.HTCMainActivity;
 
 import static com.muzima.utils.Constants.DataSyncServiceConstants.SyncStatusConstants;
 import static com.muzima.utils.Constants.STANDARD_DATE_TIMEZONE_FORMAT;
@@ -1002,13 +1004,28 @@ public class LoginActivity extends BaseActivity {
         Intent intent;
         if (new WizardFinishPreferenceService(LoginActivity.this).isWizardFinished()) {
             downloadMissingServerSettings();
+            MuzimaSettingController muzimaSettingController = ((MuzimaApplication) getApplicationContext()).getMuzimaSettingController();
+            MuzimaSetting setting = null;
+            try {
+                setting = muzimaSettingController.getSettingByProperty("Program.defintion");
+            } catch (MuzimaSettingController.MuzimaSettingFetchException e) {
+                e.printStackTrace();
+            }
+
             SetupConfigurationController configController = ((MuzimaApplication) getApplicationContext()).getSetupConfigurationController();
             ActiveConfigPreferenceService service = new ActiveConfigPreferenceService((MuzimaApplication) getApplicationContext());
             String activeConfigUuid = service.getActiveConfigUuid();
+
             if(configController.hasMultipleConfigTemplates() && StringUtils.isEmpty(activeConfigUuid))
                 intent = new Intent(getApplicationContext(), ActiveConfigSelectionActivity.class);
             else
-                intent = new Intent(getApplicationContext(), MainDashboardActivity.class);
+            {
+                if ((setting != null && setting.getValueString() != null) && setting.getValueString().equals("ATS")) {
+                    intent = new Intent(getApplicationContext(), HTCMainActivity.class);
+                } else {
+                    intent = new Intent(getApplicationContext(), MainDashboardActivity.class);
+                }
+            }
         } else {
             removeRemnantDataFromPreviousRunOfWizard();
             intent = new Intent(getApplicationContext(), SetupMethodPreferenceWizardActivity.class);

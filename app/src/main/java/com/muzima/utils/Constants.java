@@ -66,6 +66,11 @@ public class Constants {
     public static final String STANDARD_DATE_TIMEZONE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
     public static final String STANDARD_TIME_FORMAT = "HH:mm";
 
+    public static class CohortExecution {
+        public static final String COMPLETED = "COMPLETED";
+        public static final String RUNNING = "RUNNING";
+    }
+
     public static class MuzimaGPSLocationConstants {
         public static final int LOCATION_ACCESS_PERMISSION_REQUEST_CODE = 9111;
     }
@@ -115,6 +120,7 @@ public class Constants {
         public static final int SYNC_OBS_BASED_ON_CONCEPTS_ADDED = 30;
         public static final int SYNC_DERIVED_CONCEPTS_AND_OBS_BASED_ON_CHANGES_IN_CONFIG = 31;
         public static final int SYNC_DERIVED_OBS = 32;
+        public static final int SYNC_HTC_PERSONS = 33;
 
         public static class SyncStatusConstants {
             public static final int DOWNLOAD_ERROR = 0;

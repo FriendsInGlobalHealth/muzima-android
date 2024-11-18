@@ -18,14 +18,17 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.StrictMode;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
@@ -65,12 +68,14 @@ import com.muzima.api.model.SetupConfiguration;
 import com.muzima.api.model.SetupConfigurationTemplate;
 import com.muzima.api.model.SmartCardRecord;
 import com.muzima.controller.FormController;
+import com.muzima.controller.MuzimaCohortExecutionStatusController;
 import com.muzima.controller.MuzimaSettingController;
 import com.muzima.controller.PatientController;
 import com.muzima.controller.SetupConfigurationController;
 import com.muzima.domain.Credentials;
 import com.muzima.model.CohortFilter;
 import com.muzima.model.CohortWithFilter;
+import com.muzima.model.SetupActionLogModel;
 import com.muzima.model.events.BottomSheetToggleEvent;
 import com.muzima.model.events.CloseBottomSheetEvent;
 import com.muzima.model.events.CohortFilterActionEvent;
@@ -81,11 +86,13 @@ import com.muzima.scheduler.RealTimeFormUploader;
 import com.muzima.service.TagPreferenceService;
 import com.muzima.service.WizardFinishPreferenceService;
 import com.muzima.tasks.LoadDownloadedCohortsTask;
+import com.muzima.tasks.MuzimaAsyncTask;
 import com.muzima.utils.Constants;
 import com.muzima.utils.LanguageUtil;
 import com.muzima.utils.MuzimaPreferences;
 import com.muzima.utils.StringUtils;
 import com.muzima.utils.ThemeUtils;
+import com.muzima.utils.ViewUtil;
 import com.muzima.utils.smartcard.KenyaEmrShrMapper;
 import com.muzima.utils.smartcard.SmartCardIntentIntegrator;
 import com.muzima.utils.smartcard.SmartCardIntentResult;
@@ -93,14 +100,13 @@ import com.muzima.view.barcode.BarcodeCaptureActivity;
 import com.muzima.view.custom.ActivityWithBottomNavigation;
 import com.muzima.view.login.LoginActivity;
 import com.muzima.view.patients.PatientsLocationMapActivity;
+
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import static com.muzima.utils.smartcard.SmartCardIntentIntegrator.SMARTCARD_READ_REQUEST_CODE;
 
 public class MainDashboardActivity extends ActivityWithBottomNavigation implements CohortFilterAdapter.CohortFilterClickedListener {
     private static final int RC_BARCODE_CAPTURE = 9001;
@@ -144,12 +150,14 @@ public class MainDashboardActivity extends ActivityWithBottomNavigation implemen
         languageUtil.onCreate(MainDashboardActivity.this);
         super.onCreate(savedInstanceState);
         mainLayout = (DrawerLayout) getLayoutInflater().inflate(R.layout.activity_main, null);
-        setContentView(mainLayout);
         if (android.os.Build.VERSION.SDK_INT > 9) { StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build(); StrictMode.setThreadPolicy(policy); }
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
+        setContentView(mainLayout);
         loadBottomNavigation();
         RealTimeFormUploader.getInstance().uploadAllCompletedForms(getApplicationContext(), false);
         initializeResources();
         loadCohorts(false);
+
 
         tagPreferenceService = new TagPreferenceService(this);
         initDrawer();
@@ -245,7 +253,7 @@ public class MainDashboardActivity extends ActivityWithBottomNavigation implemen
                                     boolean isCohortSelected = false;
                                     for(CohortFilter cohortFilter : selectedCohortFilters){
                                         if(cohortFilter.getCohortWithFilter() != null) {
-                                           if (!cohortWithFilter.getDerivedObservationFilter().isEmpty() && cohortFilter.getCohortWithFilter().getCohort().getUuid().equals(cohortWithFilter.getCohort().getUuid()) && cohortFilter.getCohortWithFilter().getDerivedObservationFilter().equals(cohortWithFilter.getDerivedObservationFilter())) {
+                                            if (!cohortWithFilter.getDerivedObservationFilter().isEmpty() && cohortFilter.getCohortWithFilter().getCohort().getUuid().equals(cohortWithFilter.getCohort().getUuid()) && cohortFilter.getCohortWithFilter().getDerivedObservationFilter().equals(cohortWithFilter.getDerivedObservationFilter())) {
                                                 isCohortSelected = true;
                                             }
                                             else if (!cohortWithFilter.getObservationFilter().isEmpty() && cohortFilter.getCohortWithFilter().getCohort().getUuid().equals(cohortWithFilter.getCohort().getUuid()) && cohortFilter.getCohortWithFilter().getObservationFilter().equals(cohortWithFilter.getObservationFilter())) {
@@ -476,17 +484,54 @@ public class MainDashboardActivity extends ActivityWithBottomNavigation implemen
 
     private void processSync(Animation rotation){
         if(!isDataSyncRunning()) {
-            Toast.makeText(getApplicationContext(), getResources().getString(R.string.info_muzima_sync_service_in_progress), Toast.LENGTH_LONG).show();
-            new MuzimaJobScheduleBuilder(getApplicationContext()).schedulePeriodicBackgroundJob(1000, true);
+            new MuzimaAsyncTask<Void, Void, int[]>() {
+                @Override
+                protected void onPreExecute() {
+                }
 
-            refreshMenuActionView.startAnimation(rotation);
-            syncReportMenuActionView.setVisibility(View.GONE);
+                @Override
+                protected int[] doInBackground(Void... voids) {
+                    try {
+                        MuzimaCohortExecutionStatusController cohortExecutionStatusController = ((MuzimaApplication) getApplicationContext()).getMuzimaCohortExecutionStatusController();
+                        return cohortExecutionStatusController.cohortInExecution();
+                    } catch (MuzimaCohortExecutionStatusController.MuzimaCohortExecutionStatusFetchException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
 
-            notifySyncStarted();
-            showBackgroundSyncProgressDialog(MainDashboardActivity.this);
+                @Override
+                protected void onPostExecute(int[] result) {
+                    if (result != null && result.length > 0) {
+                        if (result[0] == 1) {
+                            runOnUiThread(() -> ViewUtil.displayAlertDialog(MainDashboardActivity.this, getString(R.string.tente_sincronizar_mais_tarde_a_coorte_est_em_processo_de_execu_o_no_sesp)).show());
+                        } else {
+                            startSync(rotation);
+                        }
+                    } else {
+                        runOnUiThread(() -> ViewUtil.displayAlertDialog(MainDashboardActivity.this, getString(R.string.n_o_foi_possivel_obter_o_status_de_execu_o_das_coortes_no_sesp)).show());
+                    }
+                }
+
+
+                @Override
+                protected void onBackgroundError(Exception e) {
+
+                }
+            }.execute();
         } else {
             showBackgroundSyncProgressDialog(MainDashboardActivity.this);
         }
+    }
+
+    private void startSync(Animation rotation) {
+        Toast.makeText(getApplicationContext(), getResources().getString(R.string.info_muzima_sync_service_in_progress), Toast.LENGTH_LONG).show();
+        new MuzimaJobScheduleBuilder(getApplicationContext()).schedulePeriodicBackgroundJob(1000, true);
+
+        refreshMenuActionView.startAnimation(rotation);
+        syncReportMenuActionView.setVisibility(View.GONE);
+
+        notifySyncStarted();
+        showBackgroundSyncProgressDialog(MainDashboardActivity.this);
     }
 
     protected void updateSyncProgressWidgets(boolean isSyncRunning){
@@ -516,7 +561,7 @@ public class MainDashboardActivity extends ActivityWithBottomNavigation implemen
     protected void onActivityResult(int requestCode, int resultCode, Intent dataIntent) {
         super.onActivityResult(requestCode, resultCode, dataIntent);
         switch (requestCode) {
-            case SMARTCARD_READ_REQUEST_CODE:
+            case SmartCardIntentIntegrator.SMARTCARD_READ_REQUEST_CODE:
                 processSmartCardReadResult(requestCode, resultCode, dataIntent);
                 break;
             case RC_BARCODE_CAPTURE:

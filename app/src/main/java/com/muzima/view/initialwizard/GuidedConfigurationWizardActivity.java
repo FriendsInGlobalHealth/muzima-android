@@ -59,11 +59,14 @@ import com.muzima.api.model.Location;
 import com.muzima.api.model.Media;
 import com.muzima.api.model.MuzimaSetting;
 import com.muzima.api.model.SetupConfigurationTemplate;
+import com.muzima.api.model.User;
 import com.muzima.controller.AppUsageLogsController;
 import com.muzima.controller.FormController;
 import com.muzima.controller.LocationController;
+import com.muzima.controller.MuzimaCohortExecutionStatusController;
 import com.muzima.controller.MuzimaSettingController;
 import com.muzima.controller.SetupConfigurationController;
+import com.muzima.listners.IDialogListener;
 import com.muzima.model.SetupActionLogModel;
 import com.muzima.service.DefaultEncounterLocationPreferenceService;
 import com.muzima.service.MuzimaSyncService;
@@ -76,9 +79,11 @@ import com.muzima.utils.Constants.SetupLogConstants;
 import com.muzima.utils.MemoryUtil;
 import com.muzima.utils.MuzimaPreferences;
 import com.muzima.utils.ThemeUtils;
+import com.muzima.utils.ViewUtil;
 import com.muzima.view.BroadcastListenerActivity;
 import com.muzima.view.MainDashboardActivity;
 import com.muzima.view.login.ActiveConfigSelectionActivity;
+import com.muzima.view.main.HTCMainActivity;
 
 import net.minidev.json.JSONObject;
 
@@ -94,7 +99,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 @SuppressWarnings("staticFieldLeak")
-public class GuidedConfigurationWizardActivity extends BroadcastListenerActivity implements ListAdapter.BackgroundListQueryTaskListener {
+public class GuidedConfigurationWizardActivity extends BroadcastListenerActivity implements ListAdapter.BackgroundListQueryTaskListener, IDialogListener {
     public static final String SETUP_CONFIG_UUID_INTENT_KEY = "SETUP_CONFIG_UUID";
     private List<SetupConfigurationTemplate> setupConfigurationTemplateList = new ArrayList<>();
     private int wizardLevel = 0;
@@ -249,11 +254,16 @@ public class GuidedConfigurationWizardActivity extends BroadcastListenerActivity
             public void onClick(View view) {
                 new WizardFinishPreferenceService(GuidedConfigurationWizardActivity.this).finishWizard();
 
+
                 Intent intent;
                 if(hasMoreThanOneConfig()){
                     intent = new Intent(getApplicationContext(), ActiveConfigSelectionActivity.class);
                 } else {
-                    intent = new Intent(getApplicationContext(), MainDashboardActivity.class);
+                    if (isAtsSetup()) {
+                        intent = new Intent(getApplicationContext(), HTCMainActivity.class);
+                    } else {
+                        intent = new Intent(getApplicationContext(), MainDashboardActivity.class);
+                    }
                 }
                 startActivity(intent);
                 finish();
@@ -282,7 +292,45 @@ public class GuidedConfigurationWizardActivity extends BroadcastListenerActivity
 
     private void initiateSetupConfiguration() {
         fetchConfigurationTemplates();
-        downloadSettings();
+        checkCohortExecutionStatus();
+        //downloadSettings();
+    }
+
+    private void checkCohortExecutionStatus() {
+        new MuzimaAsyncTask<Void, Void, int[]>() {
+            @Override
+            protected void onPreExecute() {
+            }
+
+            @Override
+            protected int[] doInBackground(Void... voids) {
+                try {
+                    MuzimaCohortExecutionStatusController cohortExecutionStatusController = ((MuzimaApplication) getApplicationContext()).getMuzimaCohortExecutionStatusController();
+                    return cohortExecutionStatusController.cohortInExecution();
+                } catch (MuzimaCohortExecutionStatusController.MuzimaCohortExecutionStatusFetchException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            @Override
+            protected void onPostExecute(int[] result) {
+                if (result != null && result.length > 0) {
+                    if (result[0] == 1) {
+                        runOnUiThread(() -> ViewUtil.genericDisplayAlertDialog(GuidedConfigurationWizardActivity.this, getString(R.string.tente_sincronizar_mais_tarde_a_coorte_est_em_processo_de_execu_o_no_sesp), GuidedConfigurationWizardActivity.this).show());
+                    } else {
+                        downloadSettings();
+                    }
+                } else {
+                    runOnUiThread(() -> ViewUtil.genericDisplayAlertDialog(GuidedConfigurationWizardActivity.this, getString(R.string.n_o_foi_possivel_obter_o_status_de_execu_o_das_coortes_no_sesp), GuidedConfigurationWizardActivity.this).show());
+                }
+            }
+
+
+            @Override
+            protected void onBackgroundError(Exception e) {
+
+            }
+        }.execute();
     }
 
     private void fetchConfigurationTemplates() {
@@ -728,7 +776,11 @@ public class GuidedConfigurationWizardActivity extends BroadcastListenerActivity
                 downloadProvidersLog.setSetupActionResult(resultDescription);
                 downloadProvidersLog.setSetupActionResultStatus(resultStatus);
                 onQueryTaskFinish();
-                downloadCohorts();
+                if (userHasHTCProgram()) {
+                    downloadHtcPersons();
+                } else {
+                    downloadCohorts();
+                }
             }
 
             @Override
@@ -736,6 +788,73 @@ public class GuidedConfigurationWizardActivity extends BroadcastListenerActivity
 
             }
         }.execute();
+    }
+
+    public void downloadHtcPersons(){
+        final SetupActionLogModel downloadHtcPersonsLog = new SetupActionLogModel();
+        addSetupActionLog(downloadHtcPersonsLog);
+        new MuzimaAsyncTask<Void, Void, int[]>() {
+            @Override
+            protected void onPreExecute() {
+                downloadHtcPersonsLog.setSetupAction(getString(R.string.info_htc_persons_download));
+                onQueryTaskStarted();
+            }
+
+            @Override
+            protected int[] doInBackground(Void... voids) {
+                User authenticatedUser = ((MuzimaApplication) getApplication()).getAuthenticatedUser();
+
+                if (authenticatedUser.getUuid() != null) {
+                    MuzimaSyncService muzimaSyncService = ((MuzimaApplication) getApplicationContext()).getMuzimaSyncService();
+
+                    int[] resultForHtcPersons = muzimaSyncService.downloadHtcPersons(authenticatedUser.getUuid());
+
+                    return resultForHtcPersons;
+
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(int[] result) {
+                String resultDescription = null;
+                String resultStatus = null;
+                if (result == null) {
+                    resultDescription = getString(R.string.info_htc_person_not_downloaded);
+                    resultStatus = Constants.SetupLogConstants.ACTION_SUCCESS_STATUS_LOG;
+                } else if (result[0] == Constants.DataSyncServiceConstants.SyncStatusConstants.SUCCESS) {
+                    if (result[1] == 1) {
+                        resultDescription = getString(R.string.info_htc_person_downloaded);
+                    } else {
+                        resultDescription = getString(R.string.info_htc_persons_downloaded, result[3]);
+                    }
+                    resultStatus = Constants.SetupLogConstants.ACTION_SUCCESS_STATUS_LOG;
+                } else  {
+                    wizardcompletedSuccessfully = false;
+                    resultDescription = getString(R.string.error_htc_persons_download);
+                    resultStatus = Constants.SetupLogConstants.ACTION_FAILURE_STATUS_LOG;
+                }
+                downloadHtcPersonsLog.setSetupActionResult(resultDescription);
+                downloadHtcPersonsLog.setSetupActionResultStatus(resultStatus);
+                onQueryTaskFinish();
+
+                if (setupConfigTemplateUuidList.size() > 1) {
+                    downloadCohorts();
+                }
+            }
+
+            @Override
+            protected void onBackgroundError(Exception e) {
+
+            }
+        }.execute();
+    }
+
+    private boolean userHasHTCProgram() {
+        for (String setupConfigUuid : setupConfigTemplateUuidList) {
+            if (setupConfigUuid.equals("1eaa9574-fa5a-4655-bd63-466b538c5b5d")) return true;
+        }
+        return false;
     }
 
     private void downloadConcepts() {
@@ -1412,6 +1531,9 @@ public class GuidedConfigurationWizardActivity extends BroadcastListenerActivity
 
     private synchronized void evaluateFinishStatus() {
         int TOTAL_WIZARD_STEPS = isOnlineOnlyModeEnabled ? 11 : 14;
+        if (isAtsSetup() && !hasMoreThanOneConfig()) {
+            TOTAL_WIZARD_STEPS = 4;
+        }
         if (wizardLevel == (TOTAL_WIZARD_STEPS)) {
 
             String loggedInUser = ((MuzimaApplication) getApplicationContext()).getAuthenticatedUserId();
@@ -1472,6 +1594,17 @@ public class GuidedConfigurationWizardActivity extends BroadcastListenerActivity
         evaluateFinishStatus();
     }
 
+    private boolean isAtsSetup() {
+
+        for ( SetupConfigurationTemplate setupConfigurationTemplate : setupConfigurationTemplateList) {
+            if (setupConfigurationTemplate.getUuid().equals("1eaa9574-fa5a-4655-bd63-466b538c5b5d")) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     @Override
     public void onQueryTaskCancelled() {
     }
@@ -1482,7 +1615,12 @@ public class GuidedConfigurationWizardActivity extends BroadcastListenerActivity
 
     private void updateOnlineOnlyModeSettingValue(){
         isOnlineOnlyModeEnabled = ((MuzimaApplication) getApplicationContext()).getMuzimaSettingController().isOnlineOnlyModeEnabled();
-        mainProgressbar.setMax(isOnlineOnlyModeEnabled ? 11 : 14);
+
+        if (isAtsSetup() && !hasMoreThanOneConfig()) {
+            mainProgressbar.setMax(4);
+        } else {
+            mainProgressbar.setMax(isOnlineOnlyModeEnabled ? 11 : 14);
+        }
     }
 
     private List<Integer> extractDatasetDefinitionIds() {
@@ -1570,5 +1708,15 @@ public class GuidedConfigurationWizardActivity extends BroadcastListenerActivity
                 downloadMedia();
             }
         }
+    }
+
+    @Override
+    public void doOnConfirmed() {
+        finishAffinity();
+    }
+
+    @Override
+    public void doOnDeny() {
+
     }
 }

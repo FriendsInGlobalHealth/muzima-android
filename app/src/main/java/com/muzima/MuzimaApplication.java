@@ -40,16 +40,20 @@ import com.muzima.api.service.ProviderService;
 import com.muzima.controller.AppUsageLogsController;
 import com.muzima.controller.AppReleaseController;
 import com.muzima.controller.CohortController;
+import com.muzima.controller.CohortMemberSummaryController;
 import com.muzima.controller.ConceptController;
 import com.muzima.controller.DerivedConceptController;
 import com.muzima.controller.DerivedObservationController;
 import com.muzima.controller.EncounterController;
 import com.muzima.controller.FCMTokenController;
 import com.muzima.controller.FormController;
+import com.muzima.controller.HTCPersonController;
 import com.muzima.controller.LocationController;
 import com.muzima.controller.MediaCategoryController;
 import com.muzima.controller.MediaController;
 import com.muzima.controller.MinimumSupportedAppVersionController;
+import com.muzima.controller.MuzimaCohortExecutionStatusController;
+import com.muzima.controller.MuzimaHTCFormController;
 import com.muzima.controller.MuzimaSettingController;
 import com.muzima.controller.ObservationController;
 import com.muzima.controller.PatientController;
@@ -135,6 +139,10 @@ public class MuzimaApplication extends MultiDexApplication {
     private MediaCategoryController mediaCategoryController;
     private ExecutorService executorService;
     private FormDuplicateCheckPreferenceService formDuplicateCheckPreferenceService;
+    private MuzimaCohortExecutionStatusController muzimaCohortExecutionStatusController;
+    private CohortMemberSummaryController cohortMemberSummaryController;
+    private MuzimaHTCFormController htcFormController;
+    private HTCPersonController htcPersonController;
 
     public void clearApplicationData() {
         try {
@@ -768,6 +776,53 @@ public class MuzimaApplication extends MultiDexApplication {
         } catch (IOException | ParseException e) {
             Log.e(getClass().getSimpleName(),"Encountered IO Exception ",e);
         }
+    }
+
+    public CohortMemberSummaryController getCohortMemberSummaryController() {
+        if(cohortMemberSummaryController == null){
+            try{
+                cohortMemberSummaryController = new CohortMemberSummaryController(muzimaContext.getCohortMemberSummaryService(), muzimaContext.getLastSyncTimeService(), getSntpService(), muzimaContext.getCohortService());
+            }catch (IOException e){
+                throw new RuntimeException(e);
+            }
+        }
+
+        return cohortMemberSummaryController;
+    }
+
+
+    public HTCPersonController getHtcPersonController() {
+        if(htcPersonController == null){
+            try{
+                htcPersonController = new HTCPersonController(muzimaContext.getHtcPersonService(), muzimaContext.getMuzimaHtcService(), this);
+            }catch (IOException e){
+                throw new RuntimeException(e);
+            }
+        }
+
+        return htcPersonController;
+    }
+    public MuzimaHTCFormController getHtcFormController() {
+        if(htcFormController == null){
+            try{
+                htcFormController = new MuzimaHTCFormController(muzimaContext.getMuzimaHtcService());
+            }catch (IOException e){
+                throw new RuntimeException(e);
+            }
+        }
+
+        return htcFormController;
+    }
+
+    public MuzimaCohortExecutionStatusController getMuzimaCohortExecutionStatusController() {
+        if (muzimaCohortExecutionStatusController == null) {
+            try {
+                muzimaCohortExecutionStatusController = new MuzimaCohortExecutionStatusController(this);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return muzimaCohortExecutionStatusController;
     }
 
 }

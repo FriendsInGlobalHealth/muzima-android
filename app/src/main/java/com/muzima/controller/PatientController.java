@@ -142,7 +142,7 @@ public class PatientController {
     public List<Patient> searchPatientLocally(String term, String cohortUuid, boolean useFuzzySearch) throws PatientLoadException {
         try {
             return StringUtils.isEmpty(cohortUuid)
-                    ? patientService.searchPatients(term,useFuzzySearch)
+                    ? patientService.searchPatients(term)
                     : patientService.searchPatients(term, cohortUuid);
         } catch (IOException | ParseException e) {
             throw new PatientLoadException(e);
